@@ -18,7 +18,7 @@ get_remote_version() {
 
 get_local_version() {
     if [ ! -f "$LOCAL_VERSION_FILE" ]; then
-        echo "0.0.0"  # 如果没有本地版本文件，则返回默认版本号
+        echo "0.0.0"  
     else
         cat "$LOCAL_VERSION_FILE" | tr -d '\r'
     fi
