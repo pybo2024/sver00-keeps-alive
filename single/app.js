@@ -701,7 +701,7 @@ app.get("/log", (req, res) => {
 });
 
 app.get('/ota/update', (req, res) => {
-  const downloadScriptCommand = 'curl -Ls https://raw.githubusercontent.com/ryty1/My-test/refs/heads/main/single/ota.sh -o /tmp/ota.sh';
+  const downloadScriptCommand = 'curl -Ls https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/single/ota.sh -o /tmp/ota.sh';
 
     exec(downloadScriptCommand, (error, stdout, stderr) => {
         if (error) {
