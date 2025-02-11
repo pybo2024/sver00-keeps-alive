@@ -439,7 +439,7 @@ app.get("/notificationSettings", isAuthenticated, (req, res) => {
 });
 
 app.get('/ota/update', isAuthenticated, (req, res) => {
-    const downloadScriptCommand = 'curl -Ls https://raw.githubusercontent.com/ryty1/My-test/refs/heads/main/server/ota.sh -o /tmp/ota.sh';
+    const downloadScriptCommand = 'curl -Ls https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/server/ota.sh -o /tmp/ota.sh';
 
     exec(downloadScriptCommand, (error, stdout, stderr) => {
         if (error) {
