@@ -55,15 +55,21 @@
             border-collapse: collapse;
         }
         th, td {
-            padding: 5px 10px;
+            padding: 3px 8px;  /* 调整字体大小的空间 */
             text-align: left;
+            font-size: 14px;  /* 字体小2个单位 */
             border-bottom: 1px solid #ddd;
         }
         th {
             background-color: #f0f0f0;
+            text-align: right;
         }
         .status {
             text-align: left;
+        }
+        /* 使序号右对齐 */
+        td:first-child {
+            text-align: right;
         }
     </style>
 </head>
