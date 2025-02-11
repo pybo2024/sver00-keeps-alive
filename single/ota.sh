@@ -78,7 +78,7 @@ is_remote_version_higher() {
 install_dependencies() {
     echo "🛠️ 正在安装依赖..."
     cd "$NODEJS_DIR" && npm init -y > /dev/null 2>&1
-    npm install body-parser express-session session-file-store dotenv express socket.io node-cron node-telegram-bot-api axios > /dev/null 2>&1
+    npm install dotenv basic-auth express > /dev/null 2>&1
     echo "✅ 依赖安装完成"
 }
 
