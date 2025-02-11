@@ -120,7 +120,7 @@ check_version_and_sync() {
             echo "❌ 文件同步失败，未更新任何文件。"
         fi
     else
-        echo "❌ 当前已是最新版本，无需更新。"
+        echo "🔝 当前已是最新版本，无需更新。"
     fi
 }
 
