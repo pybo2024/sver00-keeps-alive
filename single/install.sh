@@ -89,8 +89,7 @@ if [[ -d "$B1" ]]; then
     mv "$B1"/* "$A2/"
     rm -rf "$B1"
 fi
-rm -f "$A2/README.md"
-rm -f "$A2/main.zip"
+rm -f "$A2/README.md" "$A2/main.zip"
 
 if [[ -d "$A2/$TARGET_FOLDER" ]]; then
     cp -r "$A2/$TARGET_FOLDER/." "$A2/"
@@ -104,10 +103,9 @@ if [[ -d "$A2/$DELETE_FOLDER" ]]; then
 fi
 
 if [[ "$choice" -eq 1 ]]; then
+    rm -f "$A2/ota.sh" "$A2/install.sh"
     chmod 755 "$A2/app.js" > /dev/null 2>&1
     chmod 755 "$A2/hy2ip.sh" > /dev/null 2>&1
-    chmod 755 "$A2/install.sh" > /dev/null 2>&1
-    chmod 755 "$A2/ota.sh" > /dev/null 2>&1
 
     echo ""
     echo " 【 恭 喜 】： 本机保活  部署已完成  "
@@ -118,6 +116,7 @@ if [[ "$choice" -eq 1 ]]; then
     echo " ———————————————————————————————————————————————————————————— "
     echo ""
 else
+    rm -f "$A2/ota.sh"
     chmod 755 "$A2/app.js" > /dev/null 2>&1
     chmod 755 "$A2/ota.sh" > /dev/null 2>&1
 
