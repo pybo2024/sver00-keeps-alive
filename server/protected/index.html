@@ -119,6 +119,14 @@
                 window.location.href = "/login";  // 退出后跳转到登录页面
             });
         }
+        
+                // 退出登录函数（使用 GET 请求）
+        function logout() {
+            fetch("/logout") // 改为 GET 方法
+                .then(() => {
+                    window.location.href = "/login";  // 退出后跳转到登录页面
+                });
+        }
 
         // 账号检测函数（你可以根据需求保留）
         function checkAccount() {
