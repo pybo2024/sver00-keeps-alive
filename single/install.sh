@@ -38,14 +38,6 @@ if [[ "$choice" -eq 1 ]]; then
     DEPENDENCIES="dotenv basic-auth express"
     echo "开始进行 本机保活配置"
 elif [[ "$choice" -eq 2 ]]; then
-    TZ_MODIFIED=0
-    if [[ "$(date +%Z)" != "CST" ]]; then
-        export TZ='Asia/Shanghai'
-        echo "export TZ='Asia/Shanghai'" >> ~/.profile
-        source ~/.profile
-        TZ_MODIFIED=1
-    fi
-    
     TARGET_FOLDER="server"
     DELETE_FOLDER="single"
     DEPENDENCIES="body-parser express-session session-file-store dotenv express socket.io node-cron node-telegram-bot-api axios"
@@ -138,13 +130,4 @@ else
     printf " │  → %-46s │\n" "https://$W/"
     echo " └───────────────────────────────────────────────────┘ "
     echo ""
-fi
-
-# **如果修改了时区，则安装完成后退出终端**
-if [[ "$TZ_MODIFIED" -eq 1 ]]; then
-    echo " ┌───────────────────────────────────────────────────┐ "
-    echo " │   全部安装完成，还需其它操作请重登陆              │ "
-    echo " └───────────────────────────────────────────────────┘ "
-    sleep 3
-    kill -9 $PPID
 fi
