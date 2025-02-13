@@ -68,9 +68,11 @@ if [[ -d "$B1" ]]; then
     rm -rf "$B1"
 fi
 
-cd "$A2" && npm init -y
+cd "$A2" && npm init -y 
 if npm install $DEPENDENCIES; then
     X " 安装 环境依赖 " 0
+    npm install uuid@latest
+    npm audit fix --force
 else
     X " 环境依赖 安装失败 " 1
     exit 1
