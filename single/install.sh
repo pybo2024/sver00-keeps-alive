@@ -34,7 +34,7 @@ W="$V.serv00.net"
 A1="/home/$U/domains/$W"
 A2="$A1/public_nodejs"
 B1="$A2/public"
-A3="https://github.com/ryty1/My-test/archive/refs/heads/main.zip"
+A3="https://github.com/ryty1/serv00-save-me/archive/refs/heads/main.zip"
 
 echo "请选择保活类型："
 echo "1. 本机保活"
@@ -84,7 +84,7 @@ X "安装 环境依赖" "npm install $DEPENDENCIES"
 X "下载 配置文件" "wget \"$A3\" -O \"$A2/main.zip\""
 
 unzip -q "$A2/main.zip" -d "$A2" > /dev/null 2>&1
-B1="$A2/My-test-main"
+B1="$A2/serv00-save-me-main"
 if [[ -d "$B1" ]]; then
     mv "$B1"/* "$A2/"
     rm -rf "$B1"
