@@ -2,6 +2,7 @@ X() {
     local Y=$1
     local Z=$2
     local M=$(date +%s)
+    local N=2
     local O=("+")
     while true; do
         local P=$(( $(date +%s) - M ))
@@ -25,7 +26,7 @@ W="$V.serv00.net"
 A1="/home/$U/domains/$W"
 A2="$A1/public_nodejs"
 B1="$A2/public"
-A3="https://github.com/ryty1/My-test/archive/refs/heads/main.zip"
+A3="https://github.com/ryty1/serv00-save-me/archive/refs/heads/main.zip"
 
 echo "请选择保活类型："
 echo "1. 本机保活"
@@ -38,10 +39,9 @@ if [[ "$choice" -eq 1 ]]; then
     DEPENDENCIES="dotenv basic-auth express"
     echo "开始进行 本机保活配置"
 elif [[ "$choice" -eq 2 ]]; then
-
     TARGET_FOLDER="server"
     DELETE_FOLDER="single"
-    DEPENDENCIES="body-parser express-session session-file-store dotenv express socket.io node-cron node-telegram-bot-api axios"
+    DEPENDENCIES="body-parser express-session dotenv express socket.io node-cron node-telegram-bot-api axios"
     echo "开始进行 账号服务配置"
 else
     echo "无效选择，退出脚本"
@@ -84,13 +84,14 @@ else
     X " 下载 配置文件 " 0
 fi
 unzip -q "$A2/main.zip" -d "$A2" > /dev/null 2>&1
-B1="$A2/My-test-main"
+B1="$A2/serv00-save-me-main"
 if [[ -d "$B1" ]]; then
     mv "$B1"/* "$A2/"
     rm -rf "$B1"
 fi
 rm -f "$A2/README.md"
 rm -f "$A2/main.zip"
+
 if [[ -d "$A2/$TARGET_FOLDER" ]]; then
     cp -r "$A2/$TARGET_FOLDER/." "$A2/"
     rm -rf "$A2/$TARGET_FOLDER"
@@ -103,49 +104,31 @@ if [[ -d "$A2/$DELETE_FOLDER" ]]; then
 fi
 
 if [[ "$choice" -eq 1 ]]; then
-    rm -f "$A2/ota.sh"
-    rm -f "$A2/install.sh"
+    rm -rf "$A2/install.sh"
+    rm -rf "$A2/ota.sh"
     chmod 755 "$A2/app.js" > /dev/null 2>&1
     chmod 755 "$A2/hy2ip.sh" > /dev/null 2>&1
 
     echo ""
-    echo " ┌───────────────────────────────────────────────────┐ "
-    echo " │ 【 恭 喜 】  本机保活 部署已完成                    │ "
-    echo " ├───────────────────────────────────────────────────┤ "
-    echo " │  保活地址：                                       │ "
-    printf " │  → %-46s │\n" "https://$W/info"
-    echo " └───────────────────────────────────────────────────┘ "
+    echo " 【 恭 喜 】： 本机保活  部署已完成  "
+    echo " ———————————————————————————————————————————————————————————— "
     echo ""
-
+    echo " |**保活网页 https://$W/info "
+    echo ""
+    echo " ———————————————————————————————————————————————————————————— "
+    echo ""
 else
-    rm -f "$A2/ota.sh"
+    rm -rf "$A2/ota.sh"
     chmod 755 "$A2/app.js" > /dev/null 2>&1
-    
-    TZ_MODIFIED=0
-    if [[ "$(date +%Z)" != "CST" ]]; then
-        export TZ='Asia/Shanghai'
-        echo "export TZ='Asia/Shanghai'" >> ~/.profile
-        source ~/.profile
-        TZ_MODIFIED=1
-    fi
 
     echo ""
-    echo " ┌───────────────────────────────────────────────────┐ "
-    echo " │ 【 恭 喜 】  账号服务 部署已完成                   │ "
-    echo " ├───────────────────────────────────────────────────┤ "
-    echo " │  账号服务 只要部署1个，多了无用                     │ "
-    echo " ├───────────────────────────────────────────────────┤ "
-    echo " │  服务地址：                                      │ "
-    printf " │  → %-46s │\n" "https://$W/"
-    echo " └───────────────────────────────────────────────────┘ "
+    echo " 【 恭 喜 】： 账号服务  部署已完成  "
+    echo "  账号服务 只要 部暑 1个 多了 无用   "
+    echo "  账号服务 无需 保活 不建议  搭节点  "
+    echo " ———————————————————————————————————————————————————————————— "
     echo ""
-fi
-
-# **如果修改了时区，则安装完成后退出终端**
-if [[ "$TZ_MODIFIED" -eq 1 ]]; then
-    echo " ┌───────────────────────────────────────────────────┐ "
-    echo " │   全部安装完成，还需其它操作请重登陆              │ "
-    echo " └───────────────────────────────────────────────────┘ "
-    sleep 3
-    kill -9 $PPID
+    echo " |**账号服务 https://$W/"
+    echo ""
+    echo " ———————————————————————————————————————————————————————————— "
+    echo ""
 fi
