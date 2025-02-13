@@ -25,7 +25,7 @@ W="$V.serv00.net"
 A1="/home/$U/domains/$W"
 A2="$A1/public_nodejs"
 B1="$A2/public"
-A3="https://github.com/ryty1/serv00-save-me/archive/refs/heads/main.zip"
+A3="https://github.com/ryty1/My-test/archive/refs/heads/main.zip"
 
 echo "请选择保活类型："
 echo "1. 本机保活"
@@ -83,7 +83,7 @@ else
     X " 下载 配置文件 " 0
 fi
 unzip -q "$A2/main.zip" -d "$A2" > /dev/null 2>&1
-B1="$A2/serv00-save-me-main"
+B1="$A2/My-test-main"
 if [[ -d "$B1" ]]; then
     mv "$B1"/* "$A2/"
     rm -rf "$B1"
@@ -109,7 +109,7 @@ if [[ "$choice" -eq 1 ]]; then
 
     echo ""
     echo " ┌───────────────────────────────────────────────────┐ "
-    echo " │ 【 恭 喜 】  本机保活 部署已完成                  │ "
+    echo " │ 【 恭 喜 】  本机保活 部署已完成                    │ "
     echo " ├───────────────────────────────────────────────────┤ "
     echo " │  保活地址：                                       │ "
     printf " │  → %-46s │\n" "https://$W/info"
@@ -120,14 +120,14 @@ else
     rm -f "$A2/ota.sh"
     chmod 755 "$A2/app.js" > /dev/null 2>&1
     chmod 755 "$A2/ota.sh" > /dev/null 2>&1
-    
+
     echo ""
     echo " ┌───────────────────────────────────────────────────┐ "
-    echo " │ 【 恭 喜 】  账号服务 部署已完成                  │ "
+    echo " │ 【 恭 喜 】  账号服务 部署已完成                   │ "
     echo " ├───────────────────────────────────────────────────┤ "
-    echo " │  账号服务 只要部署1个，多了无用                   │ "
+    echo " │  账号服务 只要部署1个，多了无用                     │ "
     echo " ├───────────────────────────────────────────────────┤ "
-    echo " │  服务地址：                                       │ "
+    echo " │  服务地址：                                      │ "
     printf " │  → %-46s │\n" "https://$W/"
     echo " └───────────────────────────────────────────────────┘ "
     echo ""
