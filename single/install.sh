@@ -2,7 +2,6 @@ X() {
     local Y=$1
     local Z=$2
     local M=$(date +%s)
-    local N=2
     local O=("+")
     while true; do
         local P=$(( $(date +%s) - M ))
@@ -28,6 +27,8 @@ A2="$A1/public_nodejs"
 B1="$A2/public"
 A3="https://github.com/ryty1/serv00-save-me/archive/refs/heads/main.zip"
 
+TZ_MODIFIED=0
+
 echo "请选择保活类型："
 echo "1. 本机保活"
 echo "2. 账号服务"
@@ -39,6 +40,13 @@ if [[ "$choice" -eq 1 ]]; then
     DEPENDENCIES="dotenv basic-auth express"
     echo "开始进行 本机保活配置"
 elif [[ "$choice" -eq 2 ]]; then
+    if [[ "$(date +%Z)" != "CST" ]]; then
+        export TZ='Asia/Shanghai'
+        echo "export TZ='Asia/Shanghai'" >> ~/.profile
+        source ~/.profile
+        TZ_MODIFIED=1
+    fi
+
     TARGET_FOLDER="server"
     DELETE_FOLDER="single"
     DEPENDENCIES="body-parser express-session session-file-store dotenv express socket.io node-cron node-telegram-bot-api axios"
@@ -109,12 +117,13 @@ if [[ "$choice" -eq 1 ]]; then
     chmod 755 "$A2/hy2ip.sh" > /dev/null 2>&1
 
     echo ""
-    echo " 【 恭 喜 】： 本机保活  部署已完成  "
-    echo " ———————————————————————————————————————————————————————————— "
-    echo ""
-    echo " |**保活网页 https://$W/info "
-    echo ""
-    echo " ———————————————————————————————————————————————————————————— "
+    echo " ┌───────────────────────────────────────────────────┐ "
+    echo " │【 恭 喜 】： 本机保活  部署已完成                 │ "
+    echo " ├───────────────────────────────────────────────────┤ "
+    echo " │                                                   │ "
+    echo " │ 保活地址 https://$W/info "
+    echo " │                                                   │ "
+    echo " └───────────────────────────────────────────────────┘ "
     echo ""
 else
     rm -f "$A2/ota.sh"
@@ -122,13 +131,20 @@ else
     chmod 755 "$A2/ota.sh" > /dev/null 2>&1
 
     echo ""
-    echo " 【 恭 喜 】： 账号服务  部署已完成  "
-    echo "  账号服务 只要 部暑 1个 多了 无用   "
-    echo "  账号服务 无需 保活 不建议  搭节点  "
-    echo " ———————————————————————————————————————————————————————————— "
+    echo " ┌───────────────────────────────────────────────────┐ "
+    echo " │【 恭 喜 】： 账号服务  部署已完成                 │ "
+    echo " ├───────────────────────────────────────────────────┤ "
+    echo " │ 账号服务 只要部署1个 多了无用                     │ "
+    echo " ├───────────────────────────────────────────────────┤ "
+    echo " │ 服务地址 https://$W "
+    echo " └───────────────────────────────────────────────────┘ "
+fi
+
+if [[ "$TZ_MODIFIED" -eq 1 ]]; then
+    echo " ┌───────────────────────────────────────────────────┐ "
+    echo " │全部安装完成，还需其它操作请重登陆                  │ "
+    echo " └───────────────────────────────────────────────────┘ "
     echo ""
-    echo " |**账号服务 https://$W/"
-    echo ""
-    echo " ———————————————————————————————————————————————————————————— "
-    echo ""
+    sleep 3
+    kill -9 $PPID
 fi
