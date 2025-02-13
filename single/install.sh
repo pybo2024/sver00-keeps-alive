@@ -38,14 +38,6 @@ if [[ "$choice" -eq 1 ]]; then
     DEPENDENCIES="dotenv basic-auth express"
     echo "开始进行 本机保活配置"
 elif [[ "$choice" -eq 2 ]]; then
-    TZ_MODIFIED=0
-    if [[ "$(date +%Z)" != "CST" ]]; then
-        export TZ='Asia/Shanghai'
-        echo "export TZ='Asia/Shanghai'" >> ~/.profile
-        source ~/.profile
-        TZ_MODIFIED=1
-    fi
-
     TARGET_FOLDER="server"
     DELETE_FOLDER="single"
     DEPENDENCIES="body-parser express-session session-file-store dotenv express socket.io node-cron node-telegram-bot-api axios"
@@ -128,7 +120,15 @@ else
     rm -f "$A2/ota.sh"
     chmod 755 "$A2/app.js" > /dev/null 2>&1
     chmod 755 "$A2/ota.sh" > /dev/null 2>&1
-
+    
+    TZ_MODIFIED=0
+    if [[ "$(date +%Z)" != "CST" ]]; then
+        export TZ='Asia/Shanghai'
+        echo "export TZ='Asia/Shanghai'" >> ~/.profile
+        source ~/.profile
+        TZ_MODIFIED=1
+    fi
+    
     echo ""
     echo " ┌───────────────────────────────────────────────────┐ "
     echo " │ 【 恭 喜 】  账号服务 部署已完成                  │ "
