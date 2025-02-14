@@ -271,7 +271,7 @@ app.get("/hy2ip", (req, res) => {
             </head>
             <body>
                 <div class="container">
-                    <h1>HY2_IP 更新</h1>
+                    <h1>HY2_IP 更新（己失效）</h1>
                     <p>请输入 <b>更新</b> 以确认执行 IP 更新。</p>
                     <form action="/hy2ip/execute" method="POST">
                         <input type="text" name="confirmation" placeholder="更新">
