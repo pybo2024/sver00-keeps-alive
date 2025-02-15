@@ -188,16 +188,17 @@ io.on("connection", (socket) => {
 function filterNodes(nodes) {
     return nodes.filter(node => node.startsWith("vmess://") || node.startsWith("hysteria2://"));
 }
+
 async function getNodesSummary(socket) {
     const accounts = await getAccounts(true);
     if (!accounts || Object.keys(accounts).length === 0) {
         console.log("⚠️ 未找到账号数据！");
-        socket.emit("nodesSummary", { successfulNodes: [], failedAccounts: [] });
+        socket.emit("nodesSummary", { successfulNodes: { hysteria2: [], vmess: [] }, failedAccounts: [] });
         return;
     }
 
     const users = Object.keys(accounts); 
-    let successfulNodes = [];
+    let successfulNodes = { hysteria2: [], vmess: [] }; // hytseria2 放前，vmess 放后
     let failedAccounts = [];
 
     for (let i = 0; i < users.length; i++) {
@@ -215,9 +216,15 @@ async function getNodesSummary(socket) {
                 ...(nodeData.match(/hysteria2:\/\/[^\s<>"]+/g) || [])
             ]);
 
-            if (nodeLinks.length > 0) {
-                successfulNodes.push(...nodeLinks);
-            } else {
+            nodeLinks.forEach(link => {
+                if (link.startsWith("hysteria2://")) {
+                    successfulNodes.hysteria2.push(link);
+                } else if (link.startsWith("vmess://")) {
+                    successfulNodes.vmess.push(link);
+                }
+            });
+
+            if (nodeLinks.length === 0) {
                 console.log(`账号 ${user} 连接成功但无有效节点`);
                 failedAccounts.push(user);
             }
@@ -227,7 +234,20 @@ async function getNodesSummary(socket) {
         }
     }
 
-    console.log("成功的节点:", successfulNodes);
+    successfulNodes.hysteria2 = successfulNodes.hysteria2.sort((a, b) => {
+        const userA = a.split('@')[0].split('//')[1];
+        const userB = b.split('@')[0].split('//')[1];
+        return users.indexOf(userA) - users.indexOf(userB);
+    });
+
+    successfulNodes.vmess = successfulNodes.vmess.sort((a, b) => {
+        const userA = a.split('@')[0].split('//')[1];
+        const userB = b.split('@')[0].split('//')[1];
+        return users.indexOf(userA) - users.indexOf(userB);
+    });
+
+    console.log("成功的 hysteria2 节点:", successfulNodes.hysteria2);
+    console.log("成功的 vmess 节点:", successfulNodes.vmess);
     console.log("失败的账号:", failedAccounts);
 
     socket.emit("nodesSummary", { successfulNodes, failedAccounts });
