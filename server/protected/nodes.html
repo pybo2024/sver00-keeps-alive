@@ -53,12 +53,12 @@
             margin-top: 5px;
             border-radius: 5px;
             background-color: #f9f9f9;
-            word-wrap: break-word;
             text-align: left;
             width: 98%;
             height: 320px;
             overflow-y: auto;
-            white-space: pre-wrap;
+            white-space: pre-wrap; 
+            word-wrap: break-word; 
         }
         .failed-box {
             margin-top: 15px;
@@ -77,7 +77,8 @@
 
         <button class="btn btn-primary" onclick="startNodesSummary()">开始采集</button>
         <button class="btn btn-danger" onclick="copyNodes()">提取资源</button>
-        <div id="successfulNodes" class="node-box"></div>
+
+        <div id="allNodes" class="node-box"></div>
 
         <div id="failedAccounts" class="failed-box">点击“开始采集”开始获取数据...</div>
     </div>
@@ -102,16 +103,18 @@
         }
 
         socket.on("nodesSummary", (data) => {
-            console.log('完整返回数据:', data);  // 打印完整返回数据，确认是否正确接收到
+            console.log('完整返回数据:', data); 
 
-            const successfulNodesDiv = document.getElementById("successfulNodes");
+            const allNodesDiv = document.getElementById("allNodes");
             const failedAccountsDiv = document.getElementById("failedAccounts");
 
-            if (data.successfulNodes.length > 0) {
-                nodesText = data.successfulNodes.join("\n");
-                successfulNodesDiv.innerText = nodesText;
+            let allNodes = [...data.successfulNodes.hysteria2, ...data.successfulNodes.vmess];
+
+            if (allNodes.length > 0) {
+                nodesText = allNodes.join("\n");
+                allNodesDiv.innerText = nodesText;
             } else {
-                successfulNodesDiv.innerText = "没有成功的资源。";
+                allNodesDiv.innerText = "没有成功的资源。";
                 nodesText = "";
             }
 
