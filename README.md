@@ -4,7 +4,7 @@
   ##  ● 说明：
 本项目为 网页保进程，和所谓的 “账号保活” 没有关系，实现的目标是无视官方杀不杀进程或删不删crontab后，后台自动扶梯，只有当服务器重启了才需通过打开进入网页，激活vps本地自动执行命令，启动进程，不需要登录SSH的任何操作。
   ##  ● 适配：
-适配 [饭奇骏](https://github.com/frankiejun/serv00-play) 大佬的 serv00-play 脚本。需要源码再开发联系 [机器人](https://t.me/SerokBot_bot) 。
+适配 [饭奇骏](https://github.com/frankiejun/serv00-play) 大佬的 serv00-play 脚本。有问题联系本人 [机器人](https://t.me/SerokBot_bot) 。
 
 【重点】：饭佬脚本中需要设置 6 选项，开启cron设 y 。
 
