@@ -39,31 +39,5 @@
 
 ![Image Description](https://raw.githubusercontent.com/ryty1/alist-log/refs/heads/main/github_images/4.jpg?raw=true) 
 
-  ### ● 手动安装方法：
-1、[ 登录面板 ](https://panel.serv00.com) 删除自带的域名，然后新建一个项目（也可以不删除直接新创建）。
-![Image Description](https://github.com/ryty1/alist-log/blob/main/github_images/1.png?raw=true)
-       
-2、登录SSH客户端安装依赖
-
-    cd ~/domains/域名
-
-    npm install dotenv basic-auth express
-
-3、进入域名目录
-
-    cd ~/domains/域名/public_nodejs
-       
-4、创建JS文件，复制本项目里的[ app.js ](https://github.com/ryty1/sver00-keeps-alive/blob/main/app.js)内容粘贴进去
-        
-    nano app.js
-
-    Ctrl+S
-
-    Ctrl+X
-
-5、浏览器访问域名，如图（如打不开可能需要挂代理）
-        例如：https://fuhuo.serv00.net/info
-![Image Description](https://github.com/ryty1/alist-log/blob/main/github_images/3.png?raw=true)
-
   ## ● 自己可以杀掉进程再刷新网页，然后再SSH端 ps aux 查询进程
   
