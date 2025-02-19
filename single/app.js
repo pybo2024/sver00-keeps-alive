@@ -8,6 +8,7 @@ const app = express();
 const username = process.env.USER.toLowerCase(); 
 const DOMAIN_DIR = path.join(process.env.HOME, "domains", `${username}.serv00.net`, "public_nodejs");
 const scriptPath = path.join(process.env.HOME, "serv00-play", "singbox", "start.sh");
+const SINGBOX_CONFIG_PATH = path.join(process.env.HOME, "serv00-play", "singbox", "singbox.json");
 const configFilePath = path.join(__dirname, 'config.json');
 
 app.use(express.static(path.join(__dirname, 'public')));
