@@ -484,13 +484,77 @@ app.get('/newset', (req, res) => {
     res.sendFile(path.join(__dirname, "public", 'newset.html'));
 });
 
+app.get('/getGoodDomain', (req, res) => {
+  fs.readFile(SINGBOX_CONFIG_PATH, 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: '读取配置文件失败' });
+    }
+
+    try {
+      const config = JSON.parse(data);
+      res.json({ GOOD_DOMAIN: config.GOOD_DOMAIN });
+    } catch (parseError) {
+      return res.status(500).json({ error: '解析 JSON 失败' });
+    }
+  });
+});
+
+app.post('/updateGoodDomain', async (req, res) => {
+  const { GOOD_DOMAIN } = req.body;
+
+  if (!GOOD_DOMAIN) {
+    return res.status(400).json({ success: false, error: '缺少 GOOD_DOMAIN 参数' });
+  }
+
+  try {
+    const data = fs.readFileSync(SINGBOX_CONFIG_PATH, 'utf8');
+    const config = JSON.parse(data);
+
+    config.GOOD_DOMAIN = GOOD_DOMAIN;
+
+    fs.writeFileSync(SINGBOX_CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8');
+
+    console.log(`GOOD_DOMAIN 已更新为: ${GOOD_DOMAIN}`);
+
+    const processes = ['cloudflare', 'serv00sb'];
+    for (const process of processes) {
+      try {
+        const { stdout, stderr } = await execAsync(`pgrep ${process}`);
+        if (stderr) {
+          console.error(`查找进程 ${process} 时出错:`, stderr);
+        }
+        if (stdout) {
+          const pids = stdout.split('\n').filter(pid => pid.trim() !== ''); 
+          for (const pid of pids) {
+            console.log(`Killing process: ${process} (PID: ${pid})`);
+            await execAsync(`kill -9 ${pid}`);
+          }
+        }
+      } catch (error) {
+        console.error(`杀掉进程 ${process} 时出错:`, error);
+      }
+    }
+
+    res.json({ success: true, message: `GOOD_DOMAIN 更新为: ${GOOD_DOMAIN} 并已尝试杀掉相关进程` });
+
+  } catch (err) {
+    console.error('更新失败:', err);
+    res.status(500).json({ success: false, error: '更新失败，请稍后再试' });
+  }
+});
+
+app.get("/goodomains", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "goodomains.html"));
+});
+
 app.use((req, res, next) => {
-    const validPaths = ["/info", "/hy2ip", "/node", "/log", "/newset", "/ota"];
+    const validPaths = ["/info", "/hy2ip", "/node", "/log", "/newset", "/goodomains", "/ota"];
     if (validPaths.includes(req.path)) {
         return next();
     }
     res.status(404).send("页面未找到");
 });
+
 app.listen(3000, () => {
     const timestamp = new Date().toLocaleString();
     const startMsg = `${timestamp} 服务器已启动，监听端口 3000`;
