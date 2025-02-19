@@ -6,3 +6,4 @@ public/node.html
 public/log.html
 public/ota.html
 public/newset.html
+public/goodomains.html
