@@ -45,8 +45,8 @@
 
 | 序号 | 域名                      | 说明 |
 |----|------------------------|----|
-| 1  | cdnjs.com              |  |
-| 2  | www.racknerd.com       |  |
+| 1  | cdnjs.com              | 推荐 |
+| 2  | www.racknerd.com       | 推荐 |
 | 3  | ns.cloudflare.com      |  |
 | 4  | developers.cloudflare.com |  |
 | 5  | www.fortnite.com       |  |
