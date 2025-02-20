@@ -1,19 +1,20 @@
 require('dotenv').config();
 const express = require("express");
 const { exec } = require("child_process");
+const util = require('util');
 const fs = require("fs");
 const path = require("path");
 const app = express();
 
-const username = process.env.USER.toLowerCase(); 
+const username = process.env.USER.toLowerCase(); // 获取当前用户名并转换为小写
 const DOMAIN_DIR = path.join(process.env.HOME, "domains", `${username}.serv00.net`, "public_nodejs");
 const scriptPath = path.join(process.env.HOME, "serv00-play", "singbox", "start.sh");
-const SINGBOX_CONFIG_PATH = path.join(process.env.HOME, "serv00-play", "singbox", "singbox.json");
 const configFilePath = path.join(__dirname, 'config.json');
+const SINGBOX_CONFIG_PATH = path.join(process.env.HOME, "serv00-play", "singbox", "singbox.json");
 
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(express.json());
+
 let logs = [];
 let latestStartLog = "";
 function logMessage(message) {
@@ -42,8 +43,15 @@ function runShellCommand() {
     executeCommand(command, "start.sh", true);
 }
 
+function stopShellCommand() {
+    const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash killsing-box.sh`;
+    executeCommand(command, "killsing-box.sh", true);
+}
+
 function executeHy2ipScript(logMessages, callback) {
+
     const command = `cd ${process.env.HOME}/domains/${username}.serv00.net/public_nodejs/ && bash hy2ip.sh`;
+
     exec(command, (error, stdout, stderr) => {
         callback(error, stdout, stderr);
     });
@@ -134,7 +142,6 @@ app.get("/api/log", (req, res) => {
         });
     });
 });
-
 
 app.get("/log", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "log.html"));
@@ -286,7 +293,7 @@ app.get("/node", (req, res) => {
         `;
 
         allConfigs.forEach((config) => {
-            htmlContent += `<div>${config.trim()}</div>`;
+            htmlContent += `<div>${config.trim()}</div>`; // 去掉首尾空格
         });
 
         htmlContent += `
@@ -329,7 +336,7 @@ function getConfigFile() {
                 hy2name: "Hy2",
                 HIDE_USERNAME: false 
             };
-            fs.writeFileSync(configFilePath, JSON.stringify(defaultConfig, null, 2));
+            fs.writeFileSync(configFilePath, JSON.stringify(defaultConfig));
             console.log('配置文件已创建:', configFilePath);
             
             writeDefaultConfigToScript(defaultConfig);
@@ -352,7 +359,7 @@ function writeDefaultConfigToScript(config) {
         return;
     }
 
-    const exportListFuncPattern = /export_list\(\)\s*{([^}]*)}/;
+    const exportListFuncPattern = /export_list\(\)\s*{\n([\s\S]*?)}/m;
     const match = scriptContent.match(exportListFuncPattern);
 
     if (match) {
@@ -370,14 +377,16 @@ function writeDefaultConfigToScript(config) {
         console.log("没有找到 export_list() 函数，无法插入变量定义。");
     }
 
-    scriptContent = scriptContent.replace(/vmessname=".*?"/, `vmessname="\$custom_vmess-\$host-\$user"`);
-    scriptContent = scriptContent.replace(/hy2name=".*?"/, `hy2name="\$custom_hy2-\$host-\$user"`);
+    scriptContent = scriptContent.replaceAll(/vmessname=".*?"/g, `vmessname="\$custom_vmess-\$host-\$user"`);
+    scriptContent = scriptContent.replaceAll(/hy2name=".*?"/g, `hy2name="\$custom_hy2-\$host-\$user"`);
 
     if (config.HIDE_USERNAME) {
-        scriptContent = scriptContent.replace(/user=".*?"/, `user="\$(whoami | tail -c 2 | head -c 1)"`);
+        scriptContent = scriptContent.replaceAll(/user=".*?"/g, `user="\$(whoami | tail -c 2 | head -c 1)"`);
     } else {
-        scriptContent = scriptContent.replace(/user=".*?"/, `user="\$(whoami)"`);
+        scriptContent = scriptContent.replaceAll(/user=".*?"/g, `user="\$(whoami)"`);
     }
+
+    scriptContent = scriptContent.replace(/\n{2,}/g, '\n').trim();
 
     try {
         fs.writeFileSync(scriptPath, scriptContent);
@@ -390,7 +399,7 @@ function writeDefaultConfigToScript(config) {
 async function updateConfigFile(config) {
     console.log('更新配置文件:', configFilePath);
     try {
-        fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2));
+        fs.writeFileSync(configFilePath, JSON.stringify(config));
         console.log('配置文件更新成功');
     } catch (error) {
         console.error('更新配置文件时出错:', error);
@@ -407,16 +416,18 @@ async function updateConfigFile(config) {
         return;
     }
 
-    scriptContent = scriptContent.replace(/custom_vmess=".*?"/, `custom_vmess="${config.vmessname}"`);
-    scriptContent = scriptContent.replace(/custom_hy2=".*?"/, `custom_hy2="${config.hy2name}"`);
-    scriptContent = scriptContent.replace(/vmessname=".*?"/, `vmessname="\$custom_vmess-\$host-\$user"`);
-    scriptContent = scriptContent.replace(/hy2name=".*?"/, `hy2name="\$custom_hy2-\$host-\$user"`);
+    scriptContent = scriptContent.replaceAll(/custom_vmess=".*?"/g, `custom_vmess="${config.vmessname}"`);
+    scriptContent = scriptContent.replaceAll(/custom_hy2=".*?"/g, `custom_hy2="${config.hy2name}"`);
+    scriptContent = scriptContent.replaceAll(/vmessname=".*?"/g, `vmessname="\$custom_vmess-\$host-\$user"`);
+    scriptContent = scriptContent.replaceAll(/hy2name=".*?"/g, `hy2name="\$custom_hy2-\$host-\$user"`);
 
     if (config.HIDE_USERNAME) {
-        scriptContent = scriptContent.replace(/user=".*?"/, `user="\$(whoami | tail -c 2 | head -c 1)"`);
+        scriptContent = scriptContent.replaceAll(/user=".*?"/g, `user="\$(whoami | tail -c 2 | head -c 1)"`);
     } else {
-        scriptContent = scriptContent.replace(/user=".*?"/, `user="\$(whoami)"`);
+        scriptContent = scriptContent.replaceAll(/user=".*?"/g, `user="\$(whoami)"`);
     }
+
+    scriptContent = scriptContent.replace(/\n{2,}/g, '\n').trim();
 
     try {
         fs.writeFileSync(scriptPath, scriptContent);
@@ -425,47 +436,10 @@ async function updateConfigFile(config) {
         console.error('写入脚本文件时出错:', error);
         return;
     }
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    const processes = ['cloudflare', 'serv00sb'];
-    for (const process of processes) {
-        try {
-            const { stdout, stderr } = await execAsync(`pgrep ${process}`);
-            if (stderr) {
-                console.error(`查找进程 ${process} 时出错:`, stderr);
-                return;
-            }
-
-            if (stdout) {
-                const pids = stdout.split('\n').filter(pid => pid.trim() !== '');
-                console.log(`Killing process: ${process} (PIDs: ${pids.join(', ')})`);
-                for (const pid of pids) {
-                    try {
-                        await execAsync(`kill -9 ${pid}`);
-                        console.log(`进程 ${pid} 已被杀死`);
-                    } catch (killError) {
-                        console.error(`杀死进程 ${pid} 时出错:`, killError);
-                    }
-                }
-            }
-        } catch (error) {
-            console.error(`查找进程 ${process} 时出错:`, error);
-        }
-        setTimeout(() => {
-            runShellCommand();
-        }, 3000); 
-    }
-}
-
-function execAsync(command) {
-    return new Promise((resolve, reject) => {
-        exec(command, (error, stdout, stderr) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve({ stdout, stderr });
-            }
-        });
-    });
+    stopShellCommand();
+    setTimeout(() => {
+        runShellCommand();
+    }, 3000); 
 }
 
 app.get('/api/get-config', (req, res) => {
@@ -515,30 +489,14 @@ app.post('/updateGoodDomain', async (req, res) => {
     config.GOOD_DOMAIN = GOOD_DOMAIN;
 
     fs.writeFileSync(SINGBOX_CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8');
+    console.log(`优选域名 已更新为: ${GOOD_DOMAIN}`);
 
-    console.log(`GOOD_DOMAIN 已更新为: ${GOOD_DOMAIN}`);
+    stopShellCommand();
+    setTimeout(() => {
+        runShellCommand();
+    }, 3000); 
 
-    const processes = ['cloudflare', 'serv00sb'];
-    for (const process of processes) {
-      try {
-        const { stdout, stderr } = await execAsync(`pgrep ${process}`);
-        if (stderr) {
-          console.error(`查找进程 ${process} 时出错:`, stderr);
-        }
-        if (stdout) {
-          const pids = stdout.split('\n').filter(pid => pid.trim() !== ''); 
-          for (const pid of pids) {
-            console.log(`Killing process: ${process} (PID: ${pid})`);
-            await execAsync(`kill -9 ${pid}`);
-          }
-        }
-      } catch (error) {
-        console.error(`杀掉进程 ${process} 时出错:`, error);
-      }
-    }
-    runShellCommand();
-
-    res.json({ success: true, message: `GOOD_DOMAIN 更新为: ${GOOD_DOMAIN} 并已尝试杀掉相关进程` });
+    res.json({ success: true, message: `优选域名 更新为: ${GOOD_DOMAIN} 并已重启singbox` });
 
   } catch (err) {
     console.error('更新失败:', err);
@@ -557,7 +515,6 @@ app.use((req, res, next) => {
     }
     res.status(404).send("页面未找到");
 });
-
 app.listen(3000, () => {
     const timestamp = new Date().toLocaleString();
     const startMsg = `${timestamp} 服务器已启动，监听端口 3000`;
