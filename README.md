@@ -40,4 +40,15 @@
 ![Image Description](https://raw.githubusercontent.com/ryty1/alist-log/refs/heads/main/github_images/4.jpg?raw=true) 
 
   ## ● 自己可以杀掉进程再刷新网页，然后再SSH端 ps aux 查询进程
+
+  ## ● 大厂优选域名
+
+| 序号 | 域名                      | 说明 |
+|----|------------------------|----|
+| 1  | cdnjs.com              |  |
+| 2  | www.racknerd.com       |  |
+| 3  | ns.cloudflare.com      |  |
+| 4  | developers.cloudflare.com |  |
+| 5  | www.fortnite.com       |  |
+| 6  | www.wto.org            |  |
   
