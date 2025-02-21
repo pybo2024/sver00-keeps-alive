@@ -116,17 +116,25 @@ app.get("/login", async (req, res) => {
 
         const requests = users.map(user =>
             axios.get(`https://${user}.serv00.net/info`)
+                .then(response => {
+                    if (response.status >= 200 && response.status < 300) {
+                        console.log(`${user} 保活成功，状态码: ${response.status}`);
+                    } else {
+                        console.log(`${user} 保活失败，状态码: ${response.status}`);
+                        sendErrorToTG(`${user} 保活失败，状态码: ${response.status}`);
+                    }
+                })
                 .catch(err => {
-                    console.log(`${user}保活失败:`, err.message);
-                    sendErrorToTG(`${user}保活失败: ${err.message}`); 
+                    console.log(`${user} 保活失败:`, err.message);
+                    sendErrorToTG(`${user} 保活失败: ${err.message}`);
                 })
         );
 
         await Promise.all(requests);
-        console.log("所有账号的 进程保活 已访问完成");
+        console.log("所有账号的进程保活已访问完成");
     } catch (error) {
         console.error("访问 /info 失败:", error);
-        sendErrorToTG(`保活失败: ${error.message}`);  
+        sendErrorToTG(`保活失败: ${error.message}`);
     }
 
     res.sendFile(path.join(__dirname, "protected", "login.html"));
