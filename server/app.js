@@ -117,7 +117,7 @@ app.get("/login", async (req, res) => {
         const requests = users.map(user =>
             axios.get(`https://${user}.serv00.net/info`)
                 .then(response => {
-                    if (response.status >= 200 && response.status < 300) {
+                    if (response.status = 200) {
                         console.log(`${user} 保活成功，状态码: ${response.status}`);
                     } else {
                         console.log(`${user} 保活失败，状态码: ${response.status}`);
