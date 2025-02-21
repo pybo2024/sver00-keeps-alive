@@ -168,11 +168,14 @@ const getLatestTag = async () => {
     try {
         const url = `https://api.github.com/repos/${repoOwner}/${repoName}/tags`;
         const response = await axios.get(url);
-        const latestTag = response.data.length > 0 ? response.data[0].name : null;
+        if (response.data.length === 0) {
+            throw new Error('没有找到标签');
+        }
+        const latestTag = response.data[0].name; // 获取最新标签
         console.log("🔍 最新版本标签:", latestTag);
         return latestTag;
     } catch (error) {
-        console.error("❌ 获取 GitHub 标签失败:", error);
+        console.error("❌ 获取 GitHub 标签失败:", error.response ? error.response.data : error.message);
         return null;
     }
 };
@@ -214,8 +217,8 @@ const getFileContent = async (tag, filePath) => {
 
 // **保存文件**
 const saveFile = (filePath, content) => {
-    const localPath = path.join(localFolder, filePath.replace(/^single\//, ""));  // 移除 single/ 目录
-    fs.mkdirSync(path.dirname(localPath), { recursive: true });  // 创建文件夹
+    const localPath = path.join(localFolder, filePath.replace(/^single\//, "")); // 移除 single/ 目录
+    fs.mkdirSync(path.dirname(localPath), { recursive: true }); // 创建文件夹
     fs.writeFileSync(localPath, content, 'utf8');
 };
 
@@ -233,6 +236,7 @@ const installDependencies = () => {
         });
     });
 };
+
 
 wss.on('connection', async (ws) => {
     console.log('✅ Client connected');
@@ -327,11 +331,18 @@ app.post('/api/update', async (req, res) => {
                 return res.json({ message: data.message });
             }
         };
+
+        ws.onerror = (error) => {
+            res.status(500).json({ message: "❌ WebSocket 错误" });
+            console.error("WebSocket 错误:", error);
+        };
+
     } catch (error) {
         res.status(500).json({ message: "❌ 更新失败" });
         console.error(error);
     }
 });
+
 
 app.get('/ota', (req, res) => {
     res.sendFile(path.join(__dirname, "public", "ota.html"));
