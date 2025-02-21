@@ -101,7 +101,7 @@
             // 检查更新并执行
             checkUpdateBtn.addEventListener('click', async () => {
                 progressContainer.style.display = 'block';
-                updateStatus.textContent = '开始检查更新...';
+                updateStatus.textContent = '正在检查更新...';
 
                 try {
                     const response = await fetch('/api/update', {
@@ -111,20 +111,20 @@
                     updateStatus.textContent = data.message;
 
                     if (data.message === '✅ 已是最新版本，无需更新。') {
+                        progressContainer.style.display = 'none'; // 隐藏进度条
                         return;
                     }
 
                     const ws = new WebSocket('ws://localhost:3000');
                     ws.onopen = () => {
-                        ws.send(JSON.stringify({ tag: 'latestTag' }));
+                        ws.send(JSON.stringify({ tag: data.latestTag }));
                     };
 
                     ws.onmessage = (event) => {
                         const data = JSON.parse(event.data);
                         progressText.textContent = data.message;
-                        if (data.message.includes("进度")) {
-                            const percentage = parseInt(data.message.match(/(\d+)%/)[1]);
-                            progressBarFill.style.width = `${percentage}%`;
+                        if (data.progress !== undefined) {
+                            progressBarFill.style.width = `${data.progress}%`;
                         }
                     };
 
