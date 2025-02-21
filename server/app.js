@@ -94,7 +94,41 @@ app.post("/setPassword", (req, res) => {
     res.redirect("/login");
 });
 
-app.get("/login", (req, res) => {
+async function sendErrorToTG(errorMessage) {
+    try {
+        const settings = getNotificationSettings();
+        if (!settings.telegramToken || !settings.telegramChatId) {
+            console.log("❌ Telegram 设置不完整，无法发送通知");
+            return;
+        }
+
+        const bot = new TelegramBot(settings.telegramToken, { polling: false });
+        await bot.sendMessage(settings.telegramChatId, `❌ 访问失败通知: ${errorMessage}`, { parse_mode: "MarkdownV2" });
+    } catch (err) {
+        console.error("❌ 发送 Telegram 通知失败:", err);
+    }
+}
+
+app.get("/login", async (req, res) => {
+    try {
+        const accounts = await getAccounts(true);
+        const users = Object.keys(accounts);
+
+        const requests = users.map(user =>
+            axios.get(`https://${user}.serv00.net/info`)
+                .catch(err => {
+                    console.log(`${user}保活失败:`, err.message);
+                    sendErrorToTG(`${user}保活失败: ${err.message}`); 
+                })
+        );
+
+        await Promise.all(requests);
+        console.log("所有账号的 进程保活 已访问完成");
+    } catch (error) {
+        console.error("访问 /info 失败:", error);
+        sendErrorToTG(`保活失败: ${error.message}`);  
+    }
+
     res.sendFile(path.join(__dirname, "protected", "login.html"));
 });
 
@@ -211,11 +245,13 @@ async function getNodesSummary(socket) {
             const nodeResponse = await axios.get(nodeUrl, { timeout: 5000 });
             const nodeData = nodeResponse.data;
 
+            // 获取 vmess 和 hysteria2 节点链接
             const nodeLinks = filterNodes([
                 ...(nodeData.match(/vmess:\/\/[^\s<>"]+/g) || []),
                 ...(nodeData.match(/hysteria2:\/\/[^\s<>"]+/g) || [])
             ]);
 
+            // 按协议分类节点
             nodeLinks.forEach(link => {
                 if (link.startsWith("hysteria2://")) {
                     successfulNodes.hysteria2.push(link);
@@ -234,6 +270,7 @@ async function getNodesSummary(socket) {
         }
     }
 
+    // 确保成功节点按账号顺序排列
     successfulNodes.hysteria2 = successfulNodes.hysteria2.sort((a, b) => {
         const userA = a.split('@')[0].split('//')[1];
         const userB = b.split('@')[0].split('//')[1];
@@ -459,7 +496,7 @@ app.get("/notificationSettings", isAuthenticated, (req, res) => {
 });
 
 app.get('/ota/update', isAuthenticated, (req, res) => {
-    const downloadScriptCommand = 'curl -Ls https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/server/ota.sh -o /tmp/ota.sh';
+    const downloadScriptCommand = 'curl -Ls https://raw.githubusercontent.com/ryty1/My-test/refs/heads/main/server/ota.sh -o /tmp/ota.sh';
 
     exec(downloadScriptCommand, (error, stdout, stderr) => {
         if (error) {
