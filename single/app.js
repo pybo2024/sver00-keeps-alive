@@ -3,8 +3,15 @@ const express = require("express");
 const { exec } = require("child_process");
 const util = require('util');
 const fs = require("fs");
+const axios = require('axios');
 const path = require("path");
 const app = express();
+
+const localTagFile = './localTag.txt';  // 本地标签文件路径
+const localFolder = './local_files';  // 本地文件存储路径
+
+const repoOwner = 'ryty1';
+const repoName = 'My-test';
 
 const username = process.env.USER.toLowerCase(); // 获取当前用户名并转换为小写
 const DOMAIN_DIR = path.join(process.env.HOME, "domains", `${username}.serv00.net`, "public_nodejs");
@@ -147,43 +154,105 @@ app.get("/log", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "log.html"));
 });
 
-app.get('/ota/update', (req, res) => {
-    const downloadScriptCommand = 'curl -Ls https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/single/ota.sh -o /tmp/ota.sh';
-
-    exec(downloadScriptCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`❌ 下载脚本错误: ${error.message}`);
-            return res.status(500).json({ success: false, message: error.message });
-        }
-        if (stderr) {
-            console.error(`❌ 下载脚本错误输出: ${stderr}`);
-            return res.status(500).json({ success: false, message: stderr });
-        }
-
-        const executeScriptCommand = 'bash /tmp/ota.sh';
-
-        exec(executeScriptCommand, (error, stdout, stderr) => {
-            exec('rm -f /tmp/ota.sh', (err) => {
-                if (err) {
-                    console.error(`❌ 删除临时文件失败: ${err.message}`);
-                } else {
-                    console.log('✅ 临时文件已删除');
-                }
-            });
-
-            if (error) {
-                console.error(`❌ 执行脚本错误: ${error.message}`);
-                return res.status(500).json({ success: false, message: error.message });
-            }
-            if (stderr) {
-                console.error(`❌ 脚本错误输出: ${stderr}`);
-                return res.status(500).json({ success: false, message: stderr });
-            }
-            
-            res.json({ success: true, output: stdout });
-        });
-    });
+// 获取最新标签和本地标签
+app.get('/api/tags', async (req, res) => {
+  try {
+    const latestTag = await getLatestTag();
+    const localTag = getLocalTag();
+    res.json({ latestTag, localTag });
+  } catch (error) {
+    res.status(500).json({ message: '❌ 获取标签失败', error });
+  }
 });
+
+// 更新文件
+app.post('/api/update', async (req, res) => {
+  try {
+    const latestTag = await getLatestTag();
+    const localTag = getLocalTag();
+
+    // 如果本地标签已是最新，则不需要更新
+    if (latestTag === localTag) {
+      return res.json({ message: '✅ 已是最新版本，无需更新' });
+    }
+
+    // 获取并更新文件
+    const fileList = await getFileList(latestTag);
+    if (fileList.length === 0) {
+      return res.json({ message: '❌ 没有找到可更新的文件' });
+    }
+
+    let progress = 10;
+    const step = Math.floor(90 / fileList.length);
+
+    for (const file of fileList) {
+      const content = await getFileContent(latestTag, file.path);
+      if (content) {
+        saveFile(file.path, content);
+        progress += step;
+      }
+    }
+
+    // 更新本地标签
+    saveLocalTag(latestTag);
+    res.json({ message: '🎉 更新完成', progress: 100 });
+  } catch (error) {
+    res.status(500).json({ message: '❌ 更新失败', error });
+  }
+});
+
+// 获取 GitHub 最新标签
+const getLatestTag = async () => {
+  try {
+    const response = await axios.get(`https://api.github.com/repos/${repoOwner}/${repoName}/tags`);
+    return response.data.length > 0 ? response.data[0].name : null;
+  } catch (error) {
+    console.error("❌ 获取 GitHub 标签失败:", error);
+    throw error;
+  }
+};
+
+// 获取本地存储的标签
+const getLocalTag = () => {
+  if (fs.existsSync(localTagFile)) {
+    return fs.readFileSync(localTagFile, 'utf8').trim();
+  }
+  return null;
+};
+
+// 保存本地标签
+const saveLocalTag = (tag) => fs.writeFileSync(localTagFile, tag, 'utf8');
+
+// 获取文件列表
+const getFileList = async (tag) => {
+  try {
+    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/git/trees/${tag}?recursive=1`;
+    const response = await axios.get(url);
+    return response.data.tree.filter(file => file.type === 'blob' && file.path.startsWith('single/'));
+  } catch (error) {
+    console.error("❌ 获取文件列表失败:", error);
+    throw error;
+  }
+};
+
+// 下载文件内容
+const getFileContent = async (tag, filePath) => {
+  try {
+    const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/${tag}/${filePath}`;
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error(`❌ 下载失败: ${filePath}`, error);
+    return null;
+  }
+};
+
+// 保存文件到本地
+const saveFile = (filePath, content) => {
+  const localPath = path.join(localFolder, filePath.replace(/^single\//, ""));
+  fs.mkdirSync(path.dirname(localPath), { recursive: true });
+  fs.writeFileSync(localPath, content, 'utf8');
+};
 
 app.get('/ota', (req, res) => {
     res.sendFile(path.join(__dirname, "public", "ota.html"));
