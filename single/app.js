@@ -48,14 +48,6 @@ function stopShellCommand() {
     executeCommand(command, "killsing-box.sh", true);
 }
 
-function executeHy2ipScript(logMessages, callback) {
-
-    const command = `cd ${process.env.HOME}/domains/${username}.serv00.net/public_nodejs/ && bash hy2ip.sh`;
-
-    exec(command, (error, stdout, stderr) => {
-        callback(error, stdout, stderr);
-    });
-}
 function KeepAlive() {
     const command = `cd ${process.env.HOME}/serv00-play/ && bash keepalive.sh`;
     executeCommand(command, "keepalive.sh", true);
@@ -69,6 +61,26 @@ app.get("/info", (req, res) => {
 });
 
 app.use(express.urlencoded({ extended: true }));
+function executeHy2ipScript(logMessages, callback) {
+    const downloadCommand = "curl -Ls https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/single/hy2ip.sh -o /tmp/hy2ip.sh";
+    exec(downloadCommand, (error, stdout, stderr) => {
+        if (error) {
+            return callback(error, "", stderr);
+        }
+        const executeCommand = "bash /tmp/hy2ip.sh";
+        exec(executeCommand, (error, stdout, stderr) => {
+            exec("rm -f /tmp/hy2ip.sh", (err) => {
+                if (err) {
+                    console.error(`❌ 删除临时文件失败: ${err.message}`);
+                } else {
+                    console.log("✅ 临时文件已删除");
+                }
+            });
+
+            callback(error, stdout, stderr);
+        });
+    });
+}
 
 app.get("/hy2ip", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "hy2ip.html"));
