@@ -11,7 +11,7 @@ C() {
     local E=$(echo "$D" | awk -F'[s.]' '{print $2}')
     local F=("cache${E}.serv00.com" "web${E}.serv00.com" "$D")
     for G in "${F[@]}"; do
-        local H=$(curl -s --max-time 10 "https://ss.serv0.us.kg/api/getip?host=$G")
+        local H=$(curl -s --max-time 10 "https://ss.fkj.pp.ua/api/getip?host=$G")
         if [[ "$H" =~ "not found" ]]; then
             echo "未识别主机 ${G}！"
             continue
