@@ -18,8 +18,9 @@
 ![Image Description](https://github.com/ryty1/alist-log/blob/main/github_images/0.jpg?raw=true)
 
   ##  ● 功能（账号服务与本机保活无法共存）：
+  [账号服务定时访问设置](https://github.com/ryty1/web-visit)
 
-    账号服务:(只要装1台）[定时访问设置](https://github.com/ryty1/web-visit)
+    账号服务:(只要装1台）
       1、多账号管理(与保活连通）
       2、多账号节点汇聚
       3、账号状态检测
