@@ -55,7 +55,7 @@
       margin-bottom: 10px;
     }
     input[type="text"] {
-      font-size: 16px;
+      font-size: 14px;
       padding: 8px;
       width: 100%;
       box-sizing: border-box;
@@ -83,17 +83,17 @@
 </head>
 <body>
   <div class="container">
-    <h1>配置修改(可单项)</h1>
+    <h1>配置修改（可单改）</h1>
 
     <h2>当前优选: <span id="currentGoodDomain">加载中...</span></h2>
-    <input type="text" id="goodDomain" name="goodDomain" placeholder="输入新的 优选域名" />
+    <input type="text" id="goodDomain" name="goodDomain" placeholder="输入新的 优选域名，默认不填写" />
 
     <h3>【注】：以下两项需要对应修改 cloudflare 配置!</h3>
     <h2>当前ARGO_TOKEN: <span id="currentArgoAuth">加载中...</span></h2>
-    <input type="text" id="argoAuth" name="argoAuth" placeholder="输入新的 ARGO_TOKEN" />
+    <input type="text" id="argoAuth" name="argoAuth" placeholder="输入新的 ARGO_TOKEN，默认不填写" />
 
     <h2>当前ARGO域名: <span id="currentArgoDomain">加载中...</span></h2>
-    <input type="text" id="argoDomain" name="argoDomain" placeholder="输入新的 ARGO域名" />
+    <input type="text" id="argoDomain" name="argoDomain" placeholder="输入新的 ARGO域名，默认不填写" />
 
     <button type="submit" id="submitBtn">提交</button>
   </div>
