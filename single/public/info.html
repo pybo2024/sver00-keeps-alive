@@ -68,7 +68,7 @@
         button {
             padding: 12px 25px;
             font-size: 20px;
-            background-color: #4CAF50; /* 绿色背景 */
+            background-color: 
             color: white;
             border: none;
             border-radius: 4px;
@@ -114,7 +114,7 @@
             <button onclick="window.location.href='/hy2ip'">换HY2_IP</button>
             <button onclick="window.location.href='/node'">节点信息</button>
             <button onclick="window.location.href='/newset'">节点改名</button>
-            <button onclick="window.location.href='/goodomains'">优选域名</button>
+            <button onclick="window.location.href='/config'">配置修改</button>
             <button onclick="window.location.href='/log'">查看日志</button>
             <button onclick="window.location.href='/ota'">检查更新</button>
         </div>
@@ -124,8 +124,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             const firstText = "SingBox 已 复 活";
             const secondText = "HtmlOnLive 守护中";
-
-            // 生成动态文字
             function generateDynamicText(text, elementId) {
                 const element = document.getElementById(elementId);
                 element.innerHTML = text.split("").map((char, index) => 
