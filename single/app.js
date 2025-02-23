@@ -527,7 +527,7 @@ app.get("/config", (req, res) => {
 });
 
 app.use((req, res, next) => {
-    const validPaths = ["/info", "/hy2ip", "/node", "/log", "/newset", "/goodomains", "/ota"];
+    const validPaths = ["/info", "/hy2ip", "/node", "/log", "/newset", "/config", "/ota"];
     if (validPaths.includes(req.path)) {
         return next();
     }
