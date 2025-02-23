@@ -159,48 +159,6 @@ app.get("/log", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "log.html"));
 });
 
-app.get('/ota/update', (req, res) => {
-    const downloadScriptCommand = 'curl -Ls https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/single/ota.sh -o /tmp/ota.sh';
-
-    exec(downloadScriptCommand, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`❌ 下载脚本错误: ${error.message}`);
-            return res.status(500).json({ success: false, message: error.message });
-        }
-        if (stderr) {
-            console.error(`❌ 下载脚本错误输出: ${stderr}`);
-            return res.status(500).json({ success: false, message: stderr });
-        }
-
-        const executeScriptCommand = 'bash /tmp/ota.sh';
-
-        exec(executeScriptCommand, (error, stdout, stderr) => {
-            exec('rm -f /tmp/ota.sh', (err) => {
-                if (err) {
-                    console.error(`❌ 删除临时文件失败: ${err.message}`);
-                } else {
-                    console.log('✅ 临时文件已删除');
-                }
-            });
-
-            if (error) {
-                console.error(`❌ 执行脚本错误: ${error.message}`);
-                return res.status(500).json({ success: false, message: error.message });
-            }
-            if (stderr) {
-                console.error(`❌ 脚本错误输出: ${stderr}`);
-                return res.status(500).json({ success: false, message: stderr });
-            }
-            
-            res.json({ success: true, output: stdout });
-        });
-    });
-});
-
-app.get('/ota', (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "ota.html"));
-});
-
 app.get("/node", (req, res) => {
     const filePath = path.join(process.env.HOME, "serv00-play/singbox/list");
     fs.readFile(filePath, "utf8", (err, data) => {
@@ -526,8 +484,121 @@ app.get("/config", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "config.html"));
 });
 
+function readConfig() {
+    try {
+        return JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
+    } catch (err) {
+        console.error("读取配置文件失败:", err);
+        return null;
+    }
+}
+
+function writeConfig(config) {
+    try {
+        fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), "utf8");
+        console.log("配置文件更新成功！");
+    stopShellCommand();
+    setTimeout(() => {
+        runShellCommand();
+    }, 3000); 
+    } catch (err) {
+        console.error("写入配置文件失败:", err);
+    }
+}
+
+app.get("/getOutboundStatus", (req, res) => {
+    let config = readConfig();
+    if (!config) return res.status(500).json({ error: "读取配置失败" });
+
+    let status = "未出站";
+    if (config.outbounds.some(outbound => outbound.type === "wireguard")) {
+        status = "已配置 WireGuard";
+    } else if (config.outbounds.some(outbound => outbound.type === "socks")) {
+        status = "已配置 Socks";
+    }
+
+    res.json({ status });
+});
+
+app.post("/setWireGuard", (req, res) => {
+    let config = readConfig();
+    if (!config) return res.status(500).json({ error: "读取配置失败" });
+
+    config.outbounds = config.outbounds.filter(outbound => outbound.type !== "socks");
+
+    config.outbounds.unshift({
+        "type": "wireguard",
+        "tag": "wireguard-out",
+        "server": "162.159.195.100",
+        "server_port": 4500,
+        "local_address": [
+            "172.16.0.2/32",
+            "2606:4700:110:83c7:b31f:5858:b3a8:c6b1/128"
+        ],
+        "private_key": "mPZo+V9qlrMGCZ7+E6z2NI6NOV34PD++TpAR09PtCWI=",
+        "peer_public_key": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
+        "reserved": [26, 21, 228]
+    });
+
+    if (config.route && config.route.rules.length > 0) {
+        config.route.rules[0].outbound = "wireguard-out";
+    }
+
+    writeConfig(config);
+    res.json({ message: "WireGuard 出站已设置" });
+});
+
+app.post("/setSocks", (req, res) => {
+    const { server, server_port, username, password } = req.body;
+    if (!server || !server_port || !username || !password) {
+        return res.status(400).json({ error: "参数不完整" });
+    }
+
+    let config = readConfig();
+    if (!config) return res.status(500).json({ error: "读取配置失败" });
+
+    config.outbounds = config.outbounds.filter(outbound => outbound.type !== "wireguard");
+
+    config.outbounds.unshift({
+        "type": "socks",
+        "tag": "socks5_outbound",
+        "server": server,
+        "server_port": parseInt(server_port),
+        "version": "5",
+        "username": username,
+        "password": password
+    });
+
+    if (config.route && config.route.rules.length > 0) {
+        config.route.rules[0].outbound = "socks5_outbound";
+    }
+
+    writeConfig(config);
+    res.json({ message: "Socks 出站已设置" });
+});
+
+app.post("/disableOutbound", (req, res) => {
+    let config = readConfig();
+    if (!config) return res.status(500).json({ error: "读取配置失败" });
+
+    config.outbounds = config.outbounds.filter(outbound =>
+        outbound.type !== "wireguard" && outbound.type !== "socks"
+    );
+
+    if (config.route && config.route.rules.length > 0) {
+        config.route.rules[0].outbound = "direct";
+    }
+
+    writeConfig(config);
+    res.json({ message: "已关闭出站" });
+});
+
+app.get("/outbounds", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "outbounds.html"));
+});
+
 app.use((req, res, next) => {
-    const validPaths = ["/info", "/hy2ip", "/node", "/log", "/newset", "/config", "/ota"];
+    const validPaths = ["/info", "/hy2ip", "/node", "/log", "/newset", "/config", "/outbounds"];
     if (validPaths.includes(req.path)) {
         return next();
     }
