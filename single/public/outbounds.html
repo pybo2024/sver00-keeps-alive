@@ -194,7 +194,7 @@
         </div>
 
         <div class="settings-section" id="disable-outbound-container">
-            <button onclick="disableOutbound()">确认关闭</button>
+            <button id="disable-button" onclick="disableOutbound()">确认关闭</button>
         </div>
     </div>
 
@@ -225,6 +225,18 @@
                 }
 
                 showModeSettings(modeSelect.value);
+
+                // Check if outbound is disabled
+                let disableButton = document.getElementById("disable-button");
+                if (data.status === "未出站") {
+                    disableButton.disabled = true; // Disable the button if already in "未出站" state
+                    disableButton.style.backgroundColor = '#ddd'; // Change button color to indicate it's disabled
+                    disableButton.style.cursor = 'not-allowed'; // Show cursor as not allowed
+                } else {
+                    disableButton.disabled = false; // Enable the button if not in "未出站" state
+                    disableButton.style.backgroundColor = '#007bff'; // Restore button color
+                    disableButton.style.cursor = 'pointer'; // Show cursor as pointer
+                }
             } catch (err) {
                 document.getElementById("status-mode").textContent = "无法获取状态";
             }
