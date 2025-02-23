@@ -104,11 +104,9 @@ if [[ -d "$A2/$DELETE_FOLDER" ]]; then
 fi
 
 if [[ "$choice" -eq 1 ]]; then
-    rm -f "$A2/ota.sh"
     rm -f "$A2/install.sh"
     rm -f "$A2/hy2ip.sh"
     chmod 755 "$A2/app.js" > /dev/null 2>&1
-    chmod 755 "$A2/hy2ip.sh" > /dev/null 2>&1
 
     echo ""
     echo " ┌───────────────────────────────────────────────────┐ "
