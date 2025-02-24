@@ -433,10 +433,12 @@ app.get("/checkAccounts", async (req, res) => {
             return res.json({ status: "success", results: {} });
         }
 
+        let results = {};
         const promises = users.map(async (username) => {
             try {
                 const apiUrl = `https://check.594880.xyz/api/accunts?user=${username}`;
-                const response = await axios.get(apiUrl);
+                // 设置请求超时为5秒
+                const response = await axios.get(apiUrl, { timeout: 10000 });  // 5秒超时
                 const data = response.data;
 
                 let status = "未知状态";
@@ -445,15 +447,25 @@ app.get("/checkAccounts", async (req, res) => {
                     status = parts.length > 1 ? parts.pop() : data.message;
                 }
 
-                return { username, status, season: accounts[username]?.season || "--" };
+                results[username] = {
+                    status: status,
+                    season: accounts[username]?.season || "--"
+                };
             } catch (error) {
                 console.error(`账号 ${username} 检测失败:`, error.message);
-                return { username, status: "检测失败", season: accounts[username]?.season || "--" };
+                results[username] = {
+                    status: "检测失败",
+                    season: accounts[username]?.season || "--"
+                };
             }
         });
 
-        const resultsArray = await Promise.all(promises);
-        const orderedResults = Object.fromEntries(resultsArray.map(({ username, status, season }) => [username, { status, season }]));
+        await Promise.all(promises);
+
+        let orderedResults = {};
+        users.forEach(user => {
+            orderedResults[user] = results[user];
+        });
 
         res.json({ status: "success", results: orderedResults });
 
