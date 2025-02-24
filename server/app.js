@@ -424,6 +424,8 @@ app.get("/checkAccountsPage", isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, "public", "check_accounts.html"));
 });
 
+const axios = require('axios');
+
 app.get("/checkAccounts", async (req, res) => {
     try {
         const accounts = await getAccounts(); 
