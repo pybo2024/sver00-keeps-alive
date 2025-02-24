@@ -41,6 +41,10 @@
         .btn-primary:hover {
             background-color: #0056b3;
         }
+        .btn.disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
         .results-box {
             margin-top: 15px;
             padding: 15px;
@@ -66,18 +70,33 @@
         .status {
             text-align: left;
         }
+        /* 添加一个旋转加载动画 */
+        .loading::after {
+            content: "⏳";
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>账号检测</h1>
-        <button class="btn btn-primary" onclick="checkAccounts()">开始检测</button>
+        <button id="checkBtn" class="btn btn-primary" onclick="checkAccounts()">开始检测</button>
         
         <div id="results" class="results-box"></div>
     </div>
 
     <script>
         function checkAccounts() {
+            const btn = document.getElementById("checkBtn");
+            btn.disabled = true; // 禁用按钮
+            btn.classList.add("disabled");
+            btn.innerHTML = '⏳ 检测中...';
+
             fetch('/checkAccounts')
                 .then(response => response.json())
                 .then(data => {
@@ -89,8 +108,8 @@
                         // 按账号配置顺序显示账号
                         const users = Object.keys(results);
                         users.forEach((user, index) => {
-                            const season = results[user]?.season || "--";  // 取 season
-                            const status = results[user]?.status || "未知状态"; // 取 status
+                            const season = results[user]?.season || "--";  
+                            const status = results[user]?.status || "未知状态";
                             resultHTML += `<tr>
                                 <td>${index + 1}</td>
                                 <td>${user}</td>
@@ -108,6 +127,11 @@
                 .catch(error => {
                     console.error('检测失败:', error);
                     alert('检测失败，请稍后再试');
+                })
+                .finally(() => {
+                    btn.disabled = false; // 恢复按钮
+                    btn.classList.remove("disabled");
+                    btn.innerHTML = '开始检测';
                 });
         }
     </script>
