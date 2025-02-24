@@ -88,7 +88,7 @@
 <body>
     <div class="container">
         <h1>账号检测</h1>
-        <button class="btn btn-primary" id="checkBtn" onclick="checkAccounts()" disabled>
+        <button class="btn btn-primary" id="checkBtn" onclick="checkAccounts()">
             开始检测
             <div id="spinner" class="spinner" style="display: none;"></div>
         </button>
@@ -107,6 +107,10 @@
             fetch('/checkAccounts')
                 .then(response => response.json())
                 .then(data => {
+                    // 恢复按钮
+                    checkBtn.disabled = false;
+                    spinner.style.display = 'none';
+                    
                     if (data.status === "success") {
                         const results = data.results;
                         let resultHTML = '<table>';
@@ -130,18 +134,16 @@
                     } else {
                         alert('检测失败，请稍后再试');
                     }
-
-                    // 恢复按钮
-                    checkBtn.disabled = false;
-                    spinner.style.display = 'none';
                 })
                 .catch(error => {
-                    console.error('检测失败:', error);
-                    alert('检测失败，请稍后再试');
-
                     // 恢复按钮
+                    const checkBtn = document.getElementById("checkBtn");
+                    const spinner = document.getElementById("spinner");
                     checkBtn.disabled = false;
                     spinner.style.display = 'none';
+
+                    console.error('检测失败:', error);
+                    alert('检测失败，请稍后再试');
                 });
         }
     </script>
