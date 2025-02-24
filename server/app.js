@@ -433,7 +433,6 @@ app.get("/checkAccounts", async (req, res) => {
             return res.json({ status: "success", results: {} });
         }
 
-        let results = {};
         const promises = users.map(async (username) => {
             try {
                 const apiUrl = `https://check.594880.xyz/api/accunts?user=${username}`;
@@ -446,25 +445,15 @@ app.get("/checkAccounts", async (req, res) => {
                     status = parts.length > 1 ? parts.pop() : data.message;
                 }
 
-                results[username] = {
-                    status: status,
-                    season: accounts[username]?.season || "--"
-                };
+                return { username, status, season: accounts[username]?.season || "--" };
             } catch (error) {
                 console.error(`账号 ${username} 检测失败:`, error.message);
-                results[username] = {
-                    status: "检测失败",
-                    season: accounts[username]?.season || "--"
-                };
+                return { username, status: "检测失败", season: accounts[username]?.season || "--" };
             }
         });
 
-        await Promise.all(promises);
-
-        let orderedResults = {};
-        users.forEach(user => {
-            orderedResults[user] = results[user];
-        });
+        const resultsArray = await Promise.all(promises);
+        const orderedResults = Object.fromEntries(resultsArray.map(({ username, status, season }) => [username, { status, season }]));
 
         res.json({ status: "success", results: orderedResults });
 
