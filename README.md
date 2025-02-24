@@ -11,7 +11,7 @@
 【提醒】：[账号服务] 与 [本机保活] 无法共存(本人实力有限)，意味着如果需要 多账号服务 就需要单独占用一个账号。
         
   ##  ● 懒人一键自动安装：
-（不需要登陆面板），如失败可尝试下面的手动安装。配置文件感谢群友 [@guitar295](https://t.me/guitar295) 贡献调整。
+（不需要登陆面板），配置文件感谢群友 [@guitar295](https://t.me/guitar295) 贡献调整。
 
       bash <(curl -Ls https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/single/install.sh)
 
