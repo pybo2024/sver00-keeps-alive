@@ -49,7 +49,7 @@ app.use(session({
         path: path.join(__dirname, "sessions"), 
         ttl: 60 * 60,  
         retries: 1,
-        clearInterval: 600 
+        clearInterval: 3600 
     }),
     secret: getSessionSecret(), 
     resave: false,
