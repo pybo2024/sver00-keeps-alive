@@ -113,20 +113,19 @@ async function sendErrorToTG(user, status, message) {
         } else if (status === 404) {
             statusMessage = "⚠️ 保活未安装";
         } else if (status >= 500 && status <= 599) {
-            statusMessage = "❗ 服务器内部错误";
+            statusMessage = "❗ 服务器错误";
         } else {
             statusMessage = `🔄 访问异常（状态码: ${status}）`;
         }
 
         const formattedMessage = `
-⚠️ *访问失败通知*
-————————————
-👤 用户: \`${user}\`
-📶 状态: *${status}*
-📌 详情: *${statusMessage}*
-📝 错误信息: \`${message}\`
+⚠️ *手动保活失败通知*
+——————————————————
+👤 账号: \`${user}\`
+📶 状态: *${statusMessage}*
+📝 详情: *${status}*\`${message}\`
 🕒 时间: \`${now}\`
-————————————`;
+——————————————————`;
 
         await bot.sendMessage(settings.telegramChatId, formattedMessage, { parse_mode: "Markdown" });
     } catch (err) {
