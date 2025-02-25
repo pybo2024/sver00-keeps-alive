@@ -109,11 +109,11 @@ async function sendErrorToTG(user, status, message) {
         // 根据状态码设置具体提示信息
         let statusMessage;
         if (status === 403) {
-            statusMessage = "🚫 账号已封禁";
+            statusMessage = "账号已封禁";
         } else if (status === 404) {
-            statusMessage = "⚠️ 保活未安装";
+            statusMessage = "保活未安装";
         } else if (status >= 500 && status <= 599) {
-            statusMessage = "❗ 服务器错误";
+            statusMessage = "服务器错误";
         } else {
             statusMessage = `🔄 访问异常（状态码: ${status}）`;
         }
