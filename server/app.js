@@ -602,6 +602,14 @@ app.get('/ota', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, "protected", "ota.html"));
 });
 
+cron.schedule("0 */12 * * *", () => {
+    const logFile = path.join(process.env.HOME, "domains", `${username}.serv00.net`, "logs", "error.log");
+    if (fs.existsSync(logFile)) {
+        fs.truncateSync(logFile, 0);  // 清空文件内容
+        console.log("✅ 日志文件已清空:", new Date().toLocaleString());
+    }
+});
+
 server.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
 });
