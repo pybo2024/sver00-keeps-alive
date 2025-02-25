@@ -424,25 +424,21 @@ app.get("/checkAccountsPage", isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, "public", "check_accounts.html"));
 });
 
-// 定义状态码对应的输出信息
 const statusMessages = {
     200: "账号正常",
     301: "账号未注册",
     403: "账号已封禁",
-    500: "服务器内部错误",
+    404: "账号正常",
+    500: "服务器错误",
     502: "网关错误",
-    503: "服务器不可用",
-    504: "网关超时",
-    404: "账号未找到", 
-    // 可以继续添加更多的状态码和对应的输出
+    503: "VPS不可用",
+    504: "网关超时", 
 };
 
-
-// 处理检查所有账号的请求
 app.get("/checkAccounts", async (req, res) => {
     try {
-        const accounts = await getAccounts(); // 获取所有账号
-        const users = Object.keys(accounts); // 获取账号的名称
+        const accounts = await getAccounts();
+        const users = Object.keys(accounts); 
 
         if (users.length === 0) {
             return res.json({ status: "success", results: {} });
@@ -450,28 +446,27 @@ app.get("/checkAccounts", async (req, res) => {
 
         let results = {};
         const promises = users.map(async (username) => {
-            const apiUrl = `https://${username}.serv00.net`; // 拼接账号对应的 URL
+            const apiUrl = `https://${username}.serv00.net`;
 
             try {
-                // 发起请求并获取状态码，阻止重定向并处理状态码
-                const response = await axios.get(apiUrl, { maxRedirects: 0 }); // 阻止重定向
+                const response = await axios.get(apiUrl, { maxRedirects: 0 });
                 const status = response.status;
-                const message = statusMessages[status] || "未知状态"; // 获取状态码对应的信息
+                const message = statusMessages[status] || "未知状态"; 
                 results[username] = {
                     status: message,
-                    season: accounts[username]?.season || "--" // 传递账户的 season 或者默认值
+                    season: accounts[username]?.season || "--" 
                 };
             } catch (error) {
-                // 处理请求失败的情况
+                
                 const status = error.response ? error.response.status : "检测失败";
-                // 如果是301，则阻止重定向的情况
+                
                 if (error.response && error.response.status === 301) {
                     results[username] = {
-                        status: "账号未注册", // 显示 301 对应的状态信息
+                        status: "账号未注册", 
                         season: accounts[username]?.season || "--"
                     };
                 } else {
-                    // 如果状态码不在定义内，则默认显示 "未知状态"
+        
                     results[username] = {
                         status: statusMessages[status] || "未知状态",
                         season: accounts[username]?.season || "--" // 传递账户的 season 或者默认值
@@ -482,7 +477,6 @@ app.get("/checkAccounts", async (req, res) => {
 
         await Promise.all(promises);
 
-        // 保持账号顺序与配置文件一致
         let orderedResults = {};
         users.forEach(user => {
             orderedResults[user] = results[user];
