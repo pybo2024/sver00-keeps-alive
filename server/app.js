@@ -94,6 +94,8 @@ app.post("/setPassword", (req, res) => {
     res.redirect("/login");
 });
 
+const errorCache = new Map(); 
+
 async function sendErrorToTG(user, status, message) {
     try {
         const settings = getNotificationSettings();
@@ -102,11 +104,20 @@ async function sendErrorToTG(user, status, message) {
             return;
         }
 
+        const now = Date.now();
+        const cacheKey = `${user}:${status}`; 
+        const lastSentTime = errorCache.get(cacheKey);
+
+        if (lastSentTime && now - lastSentTime < 30 * 60 * 1000) {
+            console.log(`⏳ 30分钟内已发送过 ${user} 的状态 ${status}，跳过通知`);
+            return;
+        }
+
+        errorCache.set(cacheKey, now); 
+
         const bot = new TelegramBot(settings.telegramToken, { polling: false });
+        const nowStr = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
 
-        const now = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
-
-        // 根据状态码设置具体提示信息
         let statusMessage;
         if (status === 403) {
             statusMessage = "账号已封禁";
@@ -124,10 +135,12 @@ async function sendErrorToTG(user, status, message) {
 👤 账号: \`${user}\`
 📶 状态: *${statusMessage}*
 📝 详情: *${status}*(\`${message}\`)
-🕒 时间: \`${now}\`
+🕒 时间: \`${nowStr}\`
 ——————————————————`;
 
         await bot.sendMessage(settings.telegramChatId, formattedMessage, { parse_mode: "Markdown" });
+
+        console.log(`✅ 已发送 Telegram 通知: ${user} - ${status}`);
     } catch (err) {
         console.error("❌ 发送 Telegram 通知失败:", err);
     }
