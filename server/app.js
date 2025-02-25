@@ -437,12 +437,9 @@ app.get("/checkAccounts", async (req, res) => {
         const promises = users.map(async (username) => {
             try {
                 const apiUrl = `https://check.594880.xyz/api/accounts?user=${username}`;
-                console.log(`开始请求 ${username}，目标API：${apiUrl}`);
-
-                const response = await axios.get(apiUrl, { timeout: 10000 });  // 设置10秒超时
-                console.log(`请求 ${username} 完成`);
-
+                const response = await axios.get(apiUrl);
                 const data = response.data;
+
                 let status = "未知状态";
                 if (data.message) {
                     const parts = data.message.split("：");
@@ -454,11 +451,7 @@ app.get("/checkAccounts", async (req, res) => {
                     season: accounts[username]?.season || "--"
                 };
             } catch (error) {
-                if (error.code === 'ECONNABORTED') {
-                    console.error(`账号 ${username} 请求超时:`, error.message);
-                } else {
-                    console.error(`账号 ${username} 检测失败:`, error.message, error.response?.data || '无详细响应');
-                }
+                console.error(`账号 ${username} 检测失败:`, error.message);
                 results[username] = {
                     status: "检测失败",
                     season: accounts[username]?.season || "--"
