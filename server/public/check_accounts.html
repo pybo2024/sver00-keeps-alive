@@ -33,6 +33,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: 0.3s;
+            position: relative;
         }
         .btn-primary {
             background-color: #007BFF;
@@ -42,8 +43,27 @@
             background-color: #0056b3;
         }
         .btn-loading {
-            background-color: #ccc;
+            background-color: transparent;  /* 去掉背景色 */
+            color: transparent;  /* 去掉文本颜色 */
+            border: 2px solid transparent;  /* 去掉边框 */
             cursor: not-allowed;
+        }
+        .btn-loading::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            border: 4px solid #fff;
+            border-top: 4px solid #007BFF;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .results-box {
             margin-top: 15px;
@@ -92,14 +112,14 @@
     <script>
         function checkAccounts() {
             const checkBtn = document.getElementById("checkBtn");
-            checkBtn.classList.add("btn-loading");
-            checkBtn.innerText = "正在检测...";
+            checkBtn.classList.add("btn-loading");  // 添加加载动画类
+            checkBtn.innerText = '';  // 隐藏文本
 
             fetch('/checkAccounts')
                 .then(response => response.json())
                 .then(data => {
-                    checkBtn.classList.remove("btn-loading");
-                    checkBtn.innerText = "开始检测";
+                    checkBtn.classList.remove("btn-loading");  // 移除加载动画
+                    checkBtn.innerText = "开始检测";  // 恢复按钮文本
                     
                     if (data.status === "success") {
                         const results = data.results;
