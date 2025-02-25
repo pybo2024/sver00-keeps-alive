@@ -424,91 +424,62 @@ app.get("/checkAccountsPage", isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, "public", "check_accounts.html"));
 });
 
+// 定义状态码对应的输出信息
+const statusMessages = {
+    200: "账号正常",
+    301: "账号未注册",
+    403: "账号已封禁",
+    500: "服务器内部错误",
+    502: "网关错误",
+    503: "服务器不可用",
+    504: "网关超时",
+    404: "账号未找到", 
+    // 可以继续添加更多的状态码和对应的输出
+};
+
+
+// 处理检查所有账号的请求
 app.get("/checkAccounts", async (req, res) => {
     try {
-        const accounts = await getAccounts(); // 获取所有账户
-        const users = Object.keys(accounts); // 获取账户的用户名
+        const accounts = await getAccounts(); // 获取所有账号
+        const users = Object.keys(accounts); // 获取账号的名称
 
         if (users.length === 0) {
             return res.json({ status: "success", results: {} });
         }
 
-        let results = {}; // 用来存储每个账号的检测结果
+        let results = {};
         const promises = users.map(async (username) => {
+            const apiUrl = `https://${username}.serv00.net`; // 拼接账号对应的 URL
+
             try {
-                // 拼接 API 请求的 URL
-                const apiUrl = `https://check.594880.xyz/api/accounts?user=${username}`;
-
-                // 输出请求的 URL，方便调试
-                console.log(`请求 URL: ${apiUrl}`);
-
-                // 配置请求头，模拟浏览器行为
-                const config = {
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-                        'Accept': 'application/json'
-                    }
-                };
-
-                // 发送 GET 请求
-                const response = await axios.get(apiUrl, config);
-                const data = response.data; // 获取 API 返回的数据
-
-                let status = "未知状态"; // 默认状态为 "未知状态"
-                
-                // 如果返回的数据有 message 字段，直接根据它来判断状态
-                if (data.message) {
-                    const parts = data.message.split("："); // 分割中文冒号
-                    status = parts.length > 1 ? parts.pop() : data.message;
-                }
-
-                // 将账号的检测结果存储到结果对象中
+                // 发起请求并获取状态码
+                const response = await axios.get(apiUrl);
+                const status = response.status;
+                const message = statusMessages[status] || "未知状态"; // 获取状态码对应的信息
                 results[username] = {
-                    status: status,
-                    season: accounts[username]?.season || "--" // 获取季节信息，如果没有则默认为 "--"
+                    status: message,
+                    season: accounts[username]?.season || "--" // 传递账户的 season 或者默认值
                 };
             } catch (error) {
-                // 捕获 axios 请求失败的错误，并详细打印
-                if (error.response) {
-                    console.error(`账号 ${username} 检测失败:`, error.response.status, error.response.data);
-                    // 根据错误状态码处理不同情况
-                    if (error.response.status === 404) {
-                        results[username] = {
-                            status: "账号未找到", // 处理 404 错误
-                            season: accounts[username]?.season || "--"
-                        };
-                    } else if (error.response.status === 403) {
-                        results[username] = {
-                            status: "账号已封禁", // 处理 403 错误
-                            season: accounts[username]?.season || "--"
-                        };
-                    } else {
-                        results[username] = {
-                            status: "检测失败", // 其他状态码处理
-                            season: accounts[username]?.season || "--"
-                        };
-                    }
-                } else {
-                    // 捕获请求失败但没有 response（如网络错误等）
-                    console.error(`账号 ${username} 检测失败:`, error.message);
-                    results[username] = {
-                        status: "检测失败",
-                        season: accounts[username]?.season || "--"
-                    };
-                }
+                // 如果请求失败（比如网络问题或 404 等）
+                const status = error.response ? error.response.status : "检测失败";
+                console.error(`账号 ${username} 检测失败:`, error.message);
+                results[username] = {
+                    status: statusMessages[status] || "检测失败",
+                    season: accounts[username]?.season || "--" // 传递账户的 season 或者默认值
+                };
             }
         });
 
-        // 等待所有账号的请求完成
         await Promise.all(promises);
 
-        // 将结果按用户名排序
+        // 保持账号顺序与配置文件一致
         let orderedResults = {};
         users.forEach(user => {
             orderedResults[user] = results[user];
         });
 
-        // 返回最终结果
         res.json({ status: "success", results: orderedResults });
 
     } catch (error) {
