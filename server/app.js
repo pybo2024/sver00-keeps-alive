@@ -284,13 +284,11 @@ async function getNodesSummary(socket) {
             const nodeResponse = await axios.get(nodeUrl, { timeout: 5000 });
             const nodeData = nodeResponse.data;
 
-            // 获取 vmess 和 hysteria2 节点链接
             const nodeLinks = filterNodes([
                 ...(nodeData.match(/vmess:\/\/[^\s<>"]+/g) || []),
                 ...(nodeData.match(/hysteria2:\/\/[^\s<>"]+/g) || [])
             ]);
 
-            // 按协议分类节点
             nodeLinks.forEach(link => {
                 if (link.startsWith("hysteria2://")) {
                     successfulNodes.hysteria2.push(link);
@@ -309,7 +307,6 @@ async function getNodesSummary(socket) {
         }
     }
 
-    // 确保成功节点按账号顺序排列
     successfulNodes.hysteria2 = successfulNodes.hysteria2.sort((a, b) => {
         const userA = a.split('@')[0].split('//')[1];
         const userB = b.split('@')[0].split('//')[1];
