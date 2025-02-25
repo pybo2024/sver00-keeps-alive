@@ -71,13 +71,13 @@
             text-align: left;
         }
         .status.normal {
-            color: green;  /* 账号正常为绿色 */
+            color: green;  
         }
         .status.unregistered {
-            color: blue;   /* 未注册为蓝色 */
+            color: blue;   
         }
         .status.error {
-            color: red;    /* 错误状态包括封禁、检测失败等都为红色 */
+            color: red;    
         }
     </style>
 </head>
@@ -91,7 +91,6 @@
 
     <script>
         function checkAccounts() {
-            // 禁用按钮，显示加载中状态
             const checkBtn = document.getElementById("checkBtn");
             checkBtn.classList.add("btn-loading");
             checkBtn.innerText = "正在检测...";
@@ -99,7 +98,6 @@
             fetch('/checkAccounts')
                 .then(response => response.json())
                 .then(data => {
-                    // 检测完成，恢复按钮状态
                     checkBtn.classList.remove("btn-loading");
                     checkBtn.innerText = "开始检测";
                     
@@ -108,20 +106,18 @@
                         let resultHTML = '<table>';
                         resultHTML += '<tr><th>#</th><th>账号</th><th>赛季</th><th>状态</th></tr>';
 
-                        // 按账号配置顺序显示账号
                         const users = Object.keys(results);
                         users.forEach((user, index) => {
-                            const season = results[user]?.season || "--";  // 取 season
-                            const status = results[user]?.status || "未知状态"; // 取 status
-                            let statusClass = "normal"; // 默认是正常
+                            const season = results[user]?.season || "--";  
+                            const status = results[user]?.status || "未知状态"; 
+                            let statusClass = "normal"; 
                             
-                            // 账号未注册状态
                             if (status === "账号未注册") {
-                                statusClass = "unregistered"; // 未注册状态为粉色
+                                statusClass = "unregistered"; 
                             }
-                            // 其它错误状态，包括封禁、检测失败、以及其他错误状态
+                        
                             else if (status === "账号已封禁" || status === "检测失败" || status === "未知状态" || status.startsWith("服务器") || status.startsWith("网关")) {
-                                statusClass = "error"; // 所有错误状态为红色
+                                statusClass = "error"; 
                             }
 
                             resultHTML += `<tr>
@@ -141,7 +137,7 @@
                 .catch(error => {
                     console.error('检测失败:', error);
                     alert('检测失败，请稍后再试');
-                    // 检测失败，恢复按钮状态
+                
                     checkBtn.classList.remove("btn-loading");
                     checkBtn.innerText = "开始检测";
                 });
