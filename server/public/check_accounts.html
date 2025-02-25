@@ -41,10 +41,6 @@
         .btn-primary:hover {
             background-color: #0056b3;
         }
-        .btn-primary:disabled {
-            background-color: #b0d0ff;
-            cursor: not-allowed;
-        }
         .results-box {
             margin-top: 15px;
             padding: 15px;
@@ -70,47 +66,21 @@
         .status {
             text-align: left;
         }
-        .spinner {
-            margin-left: 10px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #3498db;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>账号检测</h1>
-        <button class="btn btn-primary" id="checkBtn" onclick="checkAccounts()">
-            开始检测
-            <div id="spinner" class="spinner" style="display: none;"></div>
-        </button>
+        <button class="btn btn-primary" onclick="checkAccounts()">开始检测</button>
         
         <div id="results" class="results-box"></div>
     </div>
 
     <script>
         function checkAccounts() {
-            // 禁用按钮，显示转圈
-            const checkBtn = document.getElementById("checkBtn");
-            const spinner = document.getElementById("spinner");
-            checkBtn.disabled = true;
-            spinner.style.display = 'inline-block';
-
             fetch('/checkAccounts')
                 .then(response => response.json())
                 .then(data => {
-                    // 恢复按钮
-                    checkBtn.disabled = false;
-                    spinner.style.display = 'none';
-                    
                     if (data.status === "success") {
                         const results = data.results;
                         let resultHTML = '<table>';
@@ -136,12 +106,6 @@
                     }
                 })
                 .catch(error => {
-                    // 恢复按钮
-                    const checkBtn = document.getElementById("checkBtn");
-                    const spinner = document.getElementById("spinner");
-                    checkBtn.disabled = false;
-                    spinner.style.display = 'none';
-
                     console.error('检测失败:', error);
                     alert('检测失败，请稍后再试');
                 });
