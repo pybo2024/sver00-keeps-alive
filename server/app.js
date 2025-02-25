@@ -453,8 +453,8 @@ app.get("/checkAccounts", async (req, res) => {
             const apiUrl = `https://${username}.serv00.net`; // 拼接账号对应的 URL
 
             try {
-                // 发起请求并获取状态码
-                const response = await axios.get(apiUrl);
+                // 发起请求并获取状态码，阻止重定向并处理状态码
+                const response = await axios.get(apiUrl, { maxRedirects: 0 }); // 阻止重定向
                 const status = response.status;
                 const message = statusMessages[status] || "未知状态"; // 获取状态码对应的信息
                 results[username] = {
@@ -462,13 +462,21 @@ app.get("/checkAccounts", async (req, res) => {
                     season: accounts[username]?.season || "--" // 传递账户的 season 或者默认值
                 };
             } catch (error) {
-                // 如果请求失败（比如网络问题或 404 等）
+                // 处理请求失败的情况
                 const status = error.response ? error.response.status : "检测失败";
-                console.error(`账号 ${username} 检测失败:`, error.message);
-                results[username] = {
-                    status: statusMessages[status] || "检测失败",
-                    season: accounts[username]?.season || "--" // 传递账户的 season 或者默认值
-                };
+                // 如果是301，则阻止重定向的情况
+                if (error.response && error.response.status === 301) {
+                    results[username] = {
+                        status: "账号未注册", // 显示 301 对应的状态信息
+                        season: accounts[username]?.season || "--"
+                    };
+                } else {
+                    // 如果状态码不在定义内，则默认显示 "未知状态"
+                    results[username] = {
+                        status: statusMessages[status] || "未知状态",
+                        season: accounts[username]?.season || "--" // 传递账户的 season 或者默认值
+                    };
+                }
             }
         });
 
