@@ -94,7 +94,7 @@ app.post("/setPassword", (req, res) => {
     res.redirect("/login");
 });
 
-async function sendErrorToTG(errorMessage) {
+async function sendErrorToTG(user, status, message) {
     try {
         const settings = getNotificationSettings();
         if (!settings.telegramToken || !settings.telegramChatId) {
@@ -103,7 +103,32 @@ async function sendErrorToTG(errorMessage) {
         }
 
         const bot = new TelegramBot(settings.telegramToken, { polling: false });
-        await bot.sendMessage(settings.telegramChatId, `❌ 访问失败通知: ${errorMessage}`, { parse_mode: "MarkdownV2" });
+
+        const now = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
+
+        // 根据状态码设置具体提示信息
+        let statusMessage;
+        if (status === 403) {
+            statusMessage = "🚫 账号已封禁";
+        } else if (status === 404) {
+            statusMessage = "⚠️ 保活未安装";
+        } else if (status >= 500 && status <= 599) {
+            statusMessage = "❗ 服务器内部错误";
+        } else {
+            statusMessage = `🔄 访问异常（状态码: ${status}）`;
+        }
+
+        const formattedMessage = `
+⚠️ *访问失败通知*
+————————————
+👤 用户: \`${user}\`
+📶 状态: *${status}*
+📌 详情: *${statusMessage}*
+📝 错误信息: \`${message}\`
+🕒 时间: \`${now}\`
+————————————`;
+
+        await bot.sendMessage(settings.telegramChatId, formattedMessage, { parse_mode: "Markdown" });
     } catch (err) {
         console.error("❌ 发送 Telegram 通知失败:", err);
     }
@@ -117,24 +142,31 @@ app.get("/login", async (req, res) => {
         const requests = users.map(user =>
             axios.get(`https://${user}.serv00.net/info`)
                 .then(response => {
-                    if (response.status = 200) {
-                        console.log(`${user} 保活成功，状态码: ${response.status}`);
+                    if (response.status === 200) {
+                        console.log(`✅ ${user} 保活成功，状态码: ${response.status}`);
                     } else {
-                        console.log(`${user} 保活失败，状态码: ${response.status}`);
-                        sendErrorToTG(`${user} 保活失败，状态码: ${response.status}`);
+                        console.log(`❌ ${user} 保活失败，状态码: ${response.status}`);
+                        sendErrorToTG(user, response.status, "响应状态异常");
                     }
                 })
                 .catch(err => {
-                    console.log(`${user} 保活失败:`, err.message);
-                    sendErrorToTG(`${user} 保活失败: ${err.message}`);
+                    if (err.response) {
+                        // 服务器返回了一个 HTTP 错误
+                        console.log(`❌ ${user} 保活失败，状态码: ${err.response.status}`);
+                        sendErrorToTG(user, err.response.status, err.response.statusText);
+                    } else {
+                        // 其他网络错误
+                        console.log(`❌ ${user} 保活失败: ${err.message}`);
+                        sendErrorToTG(user, "请求失败", err.message);
+                    }
                 })
         );
 
         await Promise.all(requests);
-        console.log("所有账号的进程保活已访问完成");
+        console.log("✅ 所有账号的进程保活已访问完成");
     } catch (error) {
-        console.error("访问 /info 失败:", error);
-        sendErrorToTG(`保活失败: ${error.message}`);
+        console.error("❌ 访问 /info 失败:", error);
+        sendErrorToTG("系统", "全局错误", error.message);
     }
 
     res.sendFile(path.join(__dirname, "protected", "login.html"));
