@@ -71,13 +71,13 @@
             text-align: left;
         }
         .status.normal {
-            color: green;
+            color: green;  /* 账号正常为绿色 */
         }
-        .status.banned {
-            color: red;
+        .status.unregistered {
+            color: pink;   /* 未注册为粉色 */
         }
         .status.error {
-            color: orange;
+            color: red;    /* 错误状态包括封禁、检测失败等都为红色 */
         }
     </style>
 </head>
@@ -113,19 +113,22 @@
                         users.forEach((user, index) => {
                             const season = results[user]?.season || "--";  // 取 season
                             const status = results[user]?.status || "未知状态"; // 取 status
-                            let statusClass = "status.normal"; // 默认是正常
+                            let statusClass = "normal"; // 默认是正常
                             
-                            if (status === "账号已封禁") {
-                                statusClass = "status.banned";
-                            } else if (status === "检测失败") {
-                                statusClass = "status.error";
+                            // 账号未注册状态
+                            if (status === "账号未注册") {
+                                statusClass = "unregistered"; // 未注册状态为粉色
+                            }
+                            // 其它错误状态，包括封禁、检测失败、以及其他错误状态
+                            else if (status === "账号已封禁" || status === "检测失败" || status === "未知状态" || status.startsWith("服务器") || status.startsWith("网关")) {
+                                statusClass = "error"; // 所有错误状态为红色
                             }
 
                             resultHTML += `<tr>
                                 <td>${index + 1}</td>
                                 <td>${user}</td>
                                 <td>${season}</td>
-                                <td class="${statusClass}">${status}</td>
+                                <td class="status ${statusClass}">${status}</td>
                             </tr>`;
                         });
 
