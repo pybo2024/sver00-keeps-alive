@@ -436,7 +436,7 @@ app.get("/checkAccounts", async (req, res) => {
         let results = {};
         const promises = users.map(async (username) => {
             try {
-                const apiUrl = `https://check.594880.xyz/api/accunts?user=${username}`;
+                const apiUrl = `https://check.594880.xyz/api/accounts?user=${username}`;
                 console.log(`开始请求 ${username}，目标API：${apiUrl}`);
 
                 const response = await axios.get(apiUrl, { timeout: 10000 });  // 设置10秒超时
