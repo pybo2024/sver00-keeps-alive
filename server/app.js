@@ -611,5 +611,5 @@ cron.schedule("0 */12 * * *", () => {
 });
 
 server.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(`🚀 服务己启动，监听端口: ${PORT}`);
 });
