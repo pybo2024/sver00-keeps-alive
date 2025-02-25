@@ -426,8 +426,8 @@ app.get("/checkAccountsPage", isAuthenticated, (req, res) => {
 
 app.get("/checkAccounts", async (req, res) => {
     try {
-        const accounts = await getAccounts(); 
-        const users = Object.keys(accounts); 
+        const accounts = await getAccounts();
+        const users = Object.keys(accounts);
 
         if (users.length === 0) {
             return res.json({ status: "success", results: {} });
@@ -441,8 +441,10 @@ app.get("/checkAccounts", async (req, res) => {
                 const data = response.data;
 
                 let status = "未知状态";
+                
+                // 如果返回的数据有 message 字段，直接根据它来判断状态
                 if (data.message) {
-                    const parts = data.message.split("：");
+                    const parts = data.message.split("："); // 分割中文冒号
                     status = parts.length > 1 ? parts.pop() : data.message;
                 }
 
