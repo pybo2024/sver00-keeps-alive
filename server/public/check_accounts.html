@@ -41,6 +41,10 @@
         .btn-primary:hover {
             background-color: #0056b3;
         }
+        .btn-loading {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
         .results-box {
             margin-top: 15px;
             padding: 15px;
@@ -66,21 +70,39 @@
         .status {
             text-align: left;
         }
+        .status.normal {
+            color: green;
+        }
+        .status.banned {
+            color: red;
+        }
+        .status.error {
+            color: orange;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>账号检测</h1>
-        <button class="btn btn-primary" onclick="checkAccounts()">开始检测</button>
+        <button id="checkBtn" class="btn btn-primary" onclick="checkAccounts()">开始检测</button>
         
         <div id="results" class="results-box"></div>
     </div>
 
     <script>
         function checkAccounts() {
+            // 禁用按钮，显示加载中状态
+            const checkBtn = document.getElementById("checkBtn");
+            checkBtn.classList.add("btn-loading");
+            checkBtn.innerText = "正在检测...";
+
             fetch('/checkAccounts')
                 .then(response => response.json())
                 .then(data => {
+                    // 检测完成，恢复按钮状态
+                    checkBtn.classList.remove("btn-loading");
+                    checkBtn.innerText = "开始检测";
+                    
                     if (data.status === "success") {
                         const results = data.results;
                         let resultHTML = '<table>';
@@ -91,11 +113,19 @@
                         users.forEach((user, index) => {
                             const season = results[user]?.season || "--";  // 取 season
                             const status = results[user]?.status || "未知状态"; // 取 status
+                            let statusClass = "status.normal"; // 默认是正常
+                            
+                            if (status === "账号已封禁") {
+                                statusClass = "status.banned";
+                            } else if (status === "检测失败") {
+                                statusClass = "status.error";
+                            }
+
                             resultHTML += `<tr>
                                 <td>${index + 1}</td>
                                 <td>${user}</td>
                                 <td>${season}</td>
-                                <td class="status">${status}</td>
+                                <td class="${statusClass}">${status}</td>
                             </tr>`;
                         });
 
@@ -108,6 +138,9 @@
                 .catch(error => {
                     console.error('检测失败:', error);
                     alert('检测失败，请稍后再试');
+                    // 检测失败，恢复按钮状态
+                    checkBtn.classList.remove("btn-loading");
+                    checkBtn.innerText = "开始检测";
                 });
         }
     </script>
