@@ -38,7 +38,7 @@
       7、查看日志及进程列表
     
 
-  ##  ● 截图预览：
+  ##  ● 截图预览（仅为部分展示）：
   
 ![Image Description](https://raw.githubusercontent.com/ryty1/alist-log/refs/heads/main/github_images/6.png?raw=true) 
 
