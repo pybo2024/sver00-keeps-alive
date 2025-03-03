@@ -126,17 +126,17 @@ async function sendErrorToTG(user, status, message) {
         } else if (status >= 500 && status <= 599) {
             statusMessage = "服务器错误";
         } else {
-            statusMessage = `🔄 访问异常（状态码: ${status}）`;
+            statusMessage = `访问异常`;
         }
 
         const formattedMessage = `
-⚠️ *手动保活失败通知*
+⚠️ *失败通知*
 ——————————————————
 👤 账号: \`${user}\`
-📶 状态: *${statusMessage}*
-📝 详情: *${status}*(\`${message}\`)
-🕒 时间: \`${nowStr}\`
-——————————————————`;
+📶 状态: *${status}*
+📝 详情: *${statusMessage}*
+——————————————————`
+🕒 时间: \`${nowStr}\`;
 
         await bot.sendMessage(settings.telegramChatId, formattedMessage, { parse_mode: "Markdown" });
 
