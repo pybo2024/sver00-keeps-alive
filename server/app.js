@@ -136,7 +136,7 @@ async function sendErrorToTG(user, status, message) {
 📶 状态: *${statusMessage}*
 📝 详情: *${status}*•\`${message}\`
 ——————————————————
-🕒 时间: \`${nowStr}\`;`
+🕒 时间: \`${nowStr}\``
 
         await bot.sendMessage(settings.telegramChatId, formattedMessage, { parse_mode: "Markdown" });
 
