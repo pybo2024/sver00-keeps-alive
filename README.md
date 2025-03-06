@@ -18,6 +18,7 @@
 ![Image Description](https://github.com/ryty1/alist-log/blob/main/github_images/0.jpg?raw=true)
 
   ##  ● 功能（账号服务与本机保活无法共存）：
+
   [账号服务定时访问设置](https://github.com/ryty1/web-visit)
 
     账号服务:(只要装1台）
@@ -33,7 +34,7 @@
       2、更换HY2_IP
       3、节点查看及提取
       4、节点改名
-      5、更换优选域名
+      5、修改配置参数
       6、出站配置
       7、查看日志及进程列表
     
