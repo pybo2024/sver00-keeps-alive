@@ -119,9 +119,6 @@ async function sendErrorToTG(user, status, message) {
         const nowStr = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
 
         let statusMessage;
-        let buttonText = "手动激活进程";
-        let buttonUrl = "https://${user}.serv00.net/info"; // 默认链接
-
         if (status === 403) {
             statusMessage = "账号已封禁";
             buttonText = "重新注册账号";
@@ -136,16 +133,16 @@ async function sendErrorToTG(user, status, message) {
             buttonUrl = "https://ssss.nyc.mn/";
         } else {
             statusMessage = `访问异常`;
-            buttonText = "查看IP状态";
-            buttonUrl = "https://ss.fkj.pp.ua/";
+            buttonText = "手动查看详情";
+            buttonUrl = "https://${user}.serv00.net/info";
         }
 
         const formattedMessage = `
-⚠️ *失败通知*
+㊙️ *失败通知*
 ——————————————————
 👤 账号: \`${user}\`
 📶 状态: *${statusMessage}*
-📝 详情: *${status}*
+📝 详情: *${status}*•\`${message}\`
 ——————————————————
 🕒 时间: \`${nowStr}\``;
 
@@ -158,7 +155,7 @@ async function sendErrorToTG(user, status, message) {
             }
         };
 
-        await bot.sendMessage(settings.telegramChatId, formattedMessage, options);
+        await bot.sendMessage(settings.telegramChatId, formattedMessage, { parse_mode: "Markdown" });
 
         console.log(`✅ 已发送 Telegram 通知: ${user} - ${status}`);
     } catch (err) {
@@ -183,11 +180,11 @@ app.get("/login", async (req, res) => {
                 })
                 .catch(err => {
                     if (err.response) {
-                        // 服务器返回了一个 HTTP 错误
+                       
                         console.log(`❌ ${user} 保活失败，状态码: ${err.response.status}`);
                         sendErrorToTG(user, err.response.status, err.response.statusText);
                     } else {
-                        // 其他网络错误
+                     
                         console.log(`❌ ${user} 保活失败: ${err.message}`);
                         sendErrorToTG(user, "请求失败", err.message);
                     }
