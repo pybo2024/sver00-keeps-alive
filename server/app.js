@@ -117,9 +117,21 @@ async function sendErrorToTG(user, status, message) {
 
         const bot = new TelegramBot(settings.telegramToken, { polling: false });
         const nowStr = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
+        
+        let season = "unknown"; 
+        try {
+            const accountsData = JSON.parse(fs.readFileSync(ACCOUNTS_FILE, "utf8"));
+            if (accountsData[user] && accountsData[user].season) {
+                season = accountsData[user].season.toLowerCase(); 
+            }
+        } catch (err) {
+            console.error("⚠️ 读取 accounts.json 失败:", err);
+        }
 
         let statusMessage;
-        let buttonText = "手动查看详情";
+
+        let statusMessage;
+        let buttonText = "手动进入保活";
         let buttonUrl = "https://${user}.serv00.net/info"; // 默认链接
 
         if (status === 403) {
@@ -144,6 +156,7 @@ async function sendErrorToTG(user, status, message) {
 ㊙️ *失败通知*
 ——————————————————
 👤 账号: \`${user}\`
+🖥️ 主机: \`${season}.serv00.com\`
 📶 状态: *${statusMessage}*
 📝 详情: *${status}*•\`${message}\`
 ——————————————————
