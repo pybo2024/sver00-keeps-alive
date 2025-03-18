@@ -119,6 +119,8 @@ async function sendErrorToTG(user, status, message) {
         const nowStr = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
 
         let statusMessage;
+        let buttonText = "手动查看详情";
+        let buttonUrl = "https://${user}.serv00.net/info";
         if (status === 403) {
             statusMessage = "账号已封禁";
             buttonText = "重新注册账号";
