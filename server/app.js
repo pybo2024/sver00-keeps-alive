@@ -118,14 +118,12 @@ async function sendErrorToTG(user, status, message) {
         const bot = new TelegramBot(settings.telegramToken, { polling: false });
         const nowStr = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
         
-        let season = "unknown"; 
         try {
             const accountsData = JSON.parse(fs.readFileSync(ACCOUNTS_FILE, "utf8"));
-            if (accountsData[user] && accountsData[user].season) {
-                season = accountsData[user].season.toLowerCase(); 
-            }
+            const season = accountsData[user]?.season?.toLowerCase() || "unknown"; 
         } catch (err) {
             console.error("⚠️ 读取 accounts.json 失败:", err);
+            const season = "unknown"; 
         }
 
         let statusMessage;
