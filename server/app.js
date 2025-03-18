@@ -127,8 +127,6 @@ async function sendErrorToTG(user, status, message) {
         }
 
         let statusMessage;
-
-        let statusMessage;
         let buttonText = "手动进入保活";
         let buttonUrl = "https://${user}.serv00.net/info"; // 默认链接
 
