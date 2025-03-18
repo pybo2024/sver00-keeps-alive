@@ -126,10 +126,7 @@ async function sendErrorToTG(user, status, message) {
             const season = "unknown"; 
         }
 
-        let statusMessage;
-        let buttonText = "手动进入保活";
-        let buttonUrl = "https://${user}.serv00.net/info"; // 默认链接
-
+        let statusMessage, buttonText, buttonUrl;
         if (status === 403) {
             statusMessage = "账号已封禁";
             buttonText = "重新申请账号";
