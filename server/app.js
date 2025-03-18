@@ -120,10 +120,11 @@ async function sendErrorToTG(user, status, message) {
 
         let statusMessage;
         let buttonText = "手动查看详情";
-        let buttonUrl = "https://${user}.serv00.net/info";
+        let buttonUrl = "https://${user}.serv00.net/info"; // 默认链接
+
         if (status === 403) {
             statusMessage = "账号已封禁";
-            buttonText = "重新注册账号";
+            buttonText = "重新申请账号";
             buttonUrl = "https://www.serv00.com/offer/create_new_account";
         } else if (status === 404) {
             statusMessage = "保活未安装";
@@ -135,7 +136,7 @@ async function sendErrorToTG(user, status, message) {
             buttonUrl = "https://ssss.nyc.mn/";
         } else {
             statusMessage = `访问异常`;
-            buttonText = "手动查看详情";
+            buttonText = "手动进入保活";
             buttonUrl = "https://${user}.serv00.net/info";
         }
 
@@ -157,7 +158,7 @@ async function sendErrorToTG(user, status, message) {
             }
         };
 
-        await bot.sendMessage(settings.telegramChatId, formattedMessage, { parse_mode: "Markdown" });
+        await bot.sendMessage(settings.telegramChatId, formattedMessage, options);
 
         console.log(`✅ 已发送 Telegram 通知: ${user} - ${status}`);
     } catch (err) {
