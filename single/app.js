@@ -43,7 +43,13 @@ function executeCommand(command, actionName, isStartLog = false) {
     });
 }
 
+function stopShellCommand() {
+    const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash killsing-box.sh`;
+    executeCommand(command, "killsing-box.sh", true);  
+}
+
 async function runShellCommand() {
+    console.log("runShellCommand 被调用");
     const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash start.sh`;
     try {
         const result = await executeCommand(command, "start.sh", true);
@@ -53,12 +59,8 @@ async function runShellCommand() {
     }
 }
 
-function stopShellCommand() {
-    const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash killsing-box.sh`;
-    executeCommand(command, "killsing-box.sh", true);  
-}
-
 async function KeepAlive() {
+    console.log("KeepAlive 被调用");
     const command = `cd ${process.env.HOME}/serv00-play/ && bash keepalive.sh`;
     try {
         const result = await executeCommand(command, "keepalive.sh", true);
@@ -73,16 +75,16 @@ setInterval(KeepAlive, 20000);
 app.get("/info", async (req, res) => {
     try {
         console.log("访问 /info: 开始执行 runShellCommand 和 KeepAlive");
-        
-        await runShellCommand();  // 确保命令执行
-        await KeepAlive();        
+
+        await runShellCommand();
+        await KeepAlive();
 
         console.log("访问 /info: 命令执行完毕");
     } catch (error) {
         console.error("访问 /info 出错:", error);
     }
 
-    res.sendFile(path.join(__dirname, "public", "info.html"));  // 立即返回响应
+    res.sendFile(path.join(__dirname, "public", "info.html"));
 });
 
 app.use(express.urlencoded({ extended: true }));
