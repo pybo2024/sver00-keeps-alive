@@ -174,41 +174,42 @@ async function sendErrorToTG(user, status, message) {
 }
 
 app.get("/login", async (req, res) => {
+    res.sendFile(path.join(__dirname, "protected", "login.html"));
+
     try {
         const accounts = await getAccounts(true);
         const users = Object.keys(accounts);
 
         const requests = users.map(user =>
-            axios.get(`https://${user}.serv00.net/info`,{timeout:5000})
+            axios.get(`https://${user}.serv00.net/info`, { timeout: 10000 })
                 .then(response => {
-                    if (response.status === 200) {
+                    if (response.status === 200 && response.data) {
                         console.log(`✅ ${user} 保活成功，状态码: ${response.status}`);
+                        console.log(`📄 ${user} 响应大小: ${response.data.length} 字节`);
                     } else {
-                        console.log(`❌ ${user} 保活失败，状态码: ${response.status}`);
-                        sendErrorToTG(user, response.status, "响应状态异常");
+                        console.log(`❌ ${user} 保活失败，状态码: ${response.status}，无数据`);
+                        sendErrorToTG(user, response.status, "响应数据为空");
                     }
                 })
                 .catch(err => {
                     if (err.response) {
-                       
                         console.log(`❌ ${user} 保活失败，状态码: ${err.response.status}`);
                         sendErrorToTG(user, err.response.status, err.response.statusText);
                     } else {
-                     
                         console.log(`❌ ${user} 保活失败: ${err.message}`);
                         sendErrorToTG(user, "请求失败", err.message);
                     }
                 })
         );
 
-        await Promise.all(requests);
-        console.log("✅ 所有账号的进程保活已访问完成");
+        Promise.allSettled(requests).then(() => {
+            console.log("✅ 所有账号的进程保活已访问完成");
+        });
+
     } catch (error) {
         console.error("❌ 访问 /info 失败:", error);
         sendErrorToTG("系统", "全局错误", error.message);
     }
-
-    res.sendFile(path.join(__dirname, "protected", "login.html"));
 });
 
 app.post("/login", (req, res) => {
