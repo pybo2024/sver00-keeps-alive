@@ -48,15 +48,9 @@ function stopShellCommand() {
     executeCommand(command, "killsing-box.sh", true);  
 }
 
-async function runShellCommand() {
-    console.log("runShellCommand 被调用");
+function runShellCommand() {
     const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash start.sh`;
-    try {
-        const result = await executeCommand(command, "start.sh", true);
-        console.log("runShellCommand 执行结果:", result);
-    } catch (err) {
-        console.error("runShellCommand 失败:", err);
-    }
+    executeCommand(command, "start.sh", true);
 }
 
 async function KeepAlive() {
@@ -74,9 +68,8 @@ setInterval(KeepAlive, 20000);
 
 app.get("/info", async (req, res) => {
     try {
-        console.log("访问 /info: 开始执行 runShellCommand 和 KeepAlive");
+        console.log("访问 /info: 开始执行 KeepAlive");
 
-        await runShellCommand();
         await KeepAlive();
 
         console.log("访问 /info: 命令执行完毕");
