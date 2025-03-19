@@ -22,43 +22,52 @@ function logMessage(message) {
     logs.push(message);
     if (logs.length > 5) logs.shift();
 }
-function executeCommand(command, actionName, isStartLog = false, callback) {
-    exec(command, (err, stdout, stderr) => {
-        const timestamp = new Date().toLocaleString();
-        if (err) {
-            logMessage(`${actionName} 执行失败: ${err.message}`);
-            if (callback) callback(err.message);
-            return;
-        }
-        if (stderr) {
-            logMessage(`${actionName} 执行标准错误输出: ${stderr}`);
-        }
-        const successMsg = `${actionName} 执行成功:\n${stdout}`;
-        logMessage(successMsg);
-        if (isStartLog) latestStartLog = successMsg;
-        if (callback) callback(stdout);
+const { exec } = require('child_process');
+
+function executeCommand(command, actionName, isStartLog = false) {
+    return new Promise((resolve, reject) => {
+        exec(command, (err, stdout, stderr) => {
+            const timestamp = new Date().toLocaleString();
+            if (err) {
+                logMessage(`${actionName} 执行失败: ${err.message}`);
+                reject(err.message);  
+                return;
+            }
+            if (stderr) {
+                logMessage(`${actionName} 执行标准错误输出: ${stderr}`);
+            }
+            const successMsg = `${actionName} 执行成功:\n${stdout}`;
+            logMessage(successMsg);
+            if (isStartLog) latestStartLog = successMsg;
+            resolve(stdout);  
+        });
     });
 }
+
 function runShellCommand() {
     const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash start.sh`;
-    executeCommand(command, "start.sh", true);
+    executeCommand(command, "start.sh", true) 
+        .catch(err => logMessage(`runShellCommand 失败: ${err}`));  
 }
 
 function stopShellCommand() {
     const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash killsing-box.sh`;
-    executeCommand(command, "killsing-box.sh", true);
+    executeCommand(command, "killsing-box.sh", true)
+        .catch(err => logMessage(`killsing-box 失败: ${err}`));  
 }
 
 function KeepAlive() {
     const command = `cd ${process.env.HOME}/serv00-play/ && bash keepalive.sh`;
-    executeCommand(command, "keepalive.sh", true);
+    executeCommand(command, "keepalive.sh", true) 
+        .catch(err => logMessage(`KeepAlive 失败: ${err}`));  
 }
+
 setInterval(KeepAlive, 20000);
 
 app.get("/info", (req, res) => {
-    runShellCommand();
-    KeepAlive();
-    res.sendFile(path.join(__dirname, "public", "info.html"));
+    runShellCommand();  
+    KeepAlive();        
+    res.sendFile(path.join(__dirname, "public", "info.html"));  // 立即返回响应
 });
 
 app.use(express.urlencoded({ extended: true }));
