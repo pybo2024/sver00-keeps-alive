@@ -43,29 +43,45 @@ function executeCommand(command, actionName, isStartLog = false) {
     });
 }
 
-function runShellCommand() {
+async function runShellCommand() {
     const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash start.sh`;
-    executeCommand(command, "start.sh", true) 
-        .catch(err => logMessage(`runShellCommand 失败: ${err}`));  
+    try {
+        const result = await executeCommand(command, "start.sh", true);
+        console.log("runShellCommand 执行结果:", result);
+    } catch (err) {
+        console.error("runShellCommand 失败:", err);
+    }
 }
 
 function stopShellCommand() {
     const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash killsing-box.sh`;
-    executeCommand(command, "killsing-box.sh", true)
-        .catch(err => logMessage(`killsing-box 失败: ${err}`));  
+    executeCommand(command, "killsing-box.sh", true);  
 }
 
-function KeepAlive() {
+async function KeepAlive() {
     const command = `cd ${process.env.HOME}/serv00-play/ && bash keepalive.sh`;
-    executeCommand(command, "keepalive.sh", true) 
-        .catch(err => logMessage(`KeepAlive 失败: ${err}`));  
+    try {
+        const result = await executeCommand(command, "keepalive.sh", true);
+        console.log("KeepAlive 执行结果:", result);
+    } catch (err) {
+        console.error("KeepAlive 失败:", err);
+    }
 }
 
 setInterval(KeepAlive, 20000);
 
-app.get("/info", (req, res) => {
-    runShellCommand();  
-    KeepAlive();        
+app.get("/info", async (req, res) => {
+    try {
+        console.log("访问 /info: 开始执行 runShellCommand 和 KeepAlive");
+        
+        await runShellCommand();  // 确保命令执行
+        await KeepAlive();        
+
+        console.log("访问 /info: 命令执行完毕");
+    } catch (error) {
+        console.error("访问 /info 出错:", error);
+    }
+
     res.sendFile(path.join(__dirname, "public", "info.html"));  // 立即返回响应
 });
 
