@@ -22,7 +22,6 @@ function logMessage(message) {
     logs.push(message);
     if (logs.length > 5) logs.shift();
 }
-const { exec } = require('child_process');
 
 function executeCommand(command, actionName, isStartLog = false) {
     return new Promise((resolve, reject) => {
