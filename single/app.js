@@ -66,18 +66,48 @@ async function KeepAlive() {
 
 setInterval(KeepAlive, 20000);
 
-app.get("/info", async (req, res) => {
-    try {
-        console.log("访问 /info: 开始执行 KeepAlive");
+function executeCommand(command, actionName, isStartLog = false, callback) {
+    exec(command, (err, stdout, stderr) => {
+        const timestamp = new Date().toLocaleString();
+        if (err) {
+            logMessage(`${actionName} 执行失败: ${err.message}`);
+            if (callback) callback(err.message);
+            return;
+        }
+        if (stderr) {
+            logMessage(`${actionName} 执行标准错误输出: ${stderr}`);
+        }
+        const successMsg = `${actionName} 执行成功:\n${stdout}`;
+        logMessage(successMsg);
+        if (isStartLog) latestStartLog = successMsg;
+        if (callback) callback(stdout);
+    });
+}
 
-        await KeepAlive();
+function runShellCommand(callback) {
+    const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash start.sh`;
+    executeCommand(command, "start.sh", true, callback);
+}
 
-        console.log("访问 /info: 命令执行完毕");
-    } catch (error) {
-        console.error("访问 /info 出错:", error);
-    }
+function stopShellCommand(callback) {
+    const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash killsing-box.sh`;
+    executeCommand(command, "killsing-box.sh", true, callback);
+}
 
-    res.sendFile(path.join(__dirname, "public", "info.html"));
+function KeepAlive(callback) {
+    const command = `cd ${process.env.HOME}/serv00-play/ && bash keepalive.sh`;
+    executeCommand(command, "keepalive.sh", true, callback);
+}
+
+app.get("/info", (req, res) => {
+    // 使用回调确保命令执行完成后再发送响应
+    runShellCommand((runResult) => {
+        KeepAlive((keepAliveResult) => {
+            res.sendFile(path.join(__dirname, "public", "info.html"));
+        });
+    });
+
+    // 可以在这里做一些额外处理，或根据 `runShellCommand` 和 `KeepAlive` 的执行结果做决策
 });
 
 app.use(express.urlencoded({ extended: true }));
