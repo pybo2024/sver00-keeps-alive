@@ -100,14 +100,11 @@ function KeepAlive(callback) {
 }
 
 app.get("/info", (req, res) => {
-    // 使用回调确保命令执行完成后再发送响应
     runShellCommand((runResult) => {
         KeepAlive((keepAliveResult) => {
             res.sendFile(path.join(__dirname, "public", "info.html"));
         });
     });
-
-    // 可以在这里做一些额外处理，或根据 `runShellCommand` 和 `KeepAlive` 的执行结果做决策
 });
 
 app.use(express.urlencoded({ extended: true }));
