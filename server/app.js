@@ -505,7 +505,7 @@ const statusMessages = {
     504: "网关超时", 
 };
 
-app.get("/checkAccounts", async (req, res) => {
+app.post("/checkAccounts", async (req, res) => {
     try {
         const accounts = await getAccounts();
         const users = Object.keys(accounts); 
@@ -527,7 +527,7 @@ app.get("/checkAccounts", async (req, res) => {
                 const message = statusMessages[status] || "未知状态"; 
                 results[username] = {
                     status: message,
-                    season: accounts[username]?.season || "--" 
+                    season: accounts[username]?.season || "--"
                 };
             } catch (error) {
                 let status = "检测失败";
