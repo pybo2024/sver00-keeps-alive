@@ -436,7 +436,7 @@ async function sendCheckResultsToTG() {
         }
 
         const bot = new TelegramBot(settings.telegramToken, { polling: false });
-        const response = const response = await axios.post(`https://${process.env.USER}.serv00.net/checkAccounts`, {});
+        const response = await axios.post(`https://${process.env.USER}.serv00.net/checkAccounts`, {});
         const data = response.data.results;
 
         if (!data || Object.keys(data).length === 0) {
