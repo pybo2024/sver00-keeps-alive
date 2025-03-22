@@ -11,30 +11,27 @@
             box-sizing: border-box;
             font-family: Arial, sans-serif;
         }
+
+        /* 先用纯色背景，避免加载时出现闪屏 */
         body {
             padding: 20px;
-            background: linear-gradient(135deg,
-                #ff0000,  /* 纯红 */
-                #ff7300,  /* 橙色 */
-                #ffeb00,  /* 亮黄色 */
-                #47e500,  /* 亮绿色 */
-                #00e5c0,  /* 青绿色 */
-                #008cff,  /* 亮蓝色 */
-                #4b00ff,  /* 紫色 */
-                #ff00c8   /* 粉紫色 */
-             ); 
-             display: flex;
-             justify-content: center;
-             transition: background-color 0.5s ease;
-         }
+            background: #000; /* 预加载纯黑背景 */
+            background-attachment: fixed;
+            background-size: 400% 400%;
+            display: flex;
+            justify-content: center;
+            transition: background 0.5s ease-in-out;
+        }
+
         .container {
             width: 100%;
             max-width: 800px;
-            background: rgba(255, 255, 255, 0.4); /* Increased transparency */
+            background: rgba(255, 255, 255, 0.4); /* 半透明背景 */
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
         }
+
         h1 {
             text-align: center;
             margin-bottom: 20px;
@@ -42,40 +39,47 @@
             color: #FFD700;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
+
         .post {
             padding: 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
+
         .post h2 {
             font-size: clamp(16px, 4vw, 22px);
-            font-weight: bold; /* Bold title */
-            color: black; /* Title color */
+            font-weight: bold;
+            color: black;
             margin-bottom: 8px;
             transition: color 0.3s ease;
         }
+
         .post h2:hover {
-            color: #444; /* Darker hover color */
+            color: #444;
         }
+
         .divider {
-            border-top: 2px dashed rgba(0, 0, 0, 0.6); /* Dashed line between title and content */
+            border-top: 2px dashed rgba(0, 0, 0, 0.6);
             margin: 8px 0;
         }
+
         .post p {
             color: #222;
             font-size: clamp(14px, 3.5vw, 18px);
             line-height: 1.6;
         }
+
         .post .author {
             font-size: clamp(12px, 3vw, 14px);
             color: #555;
             margin-top: 5px;
         }
 
-        /* Responsive design */
+        /* 移动端优化 */
         @media (max-width: 600px) {
             body {
                 padding: 10px;
             }
+
             .container {
                 max-width: 90%;
                 padding: 15px;
@@ -91,23 +95,29 @@
     </div>
 
     <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        fetch("/api/posts")
-            .then(response => response.json())
-            .then(posts => {
-                const postList = document.getElementById("postList");
-                postList.innerHTML = posts.map(post => `
-                    <div class="post">
-                        <h2>${post.title}</h2>
-                        <div class="divider"></div>
-                        <p>${post.content}</p>
-                        <div class="author">${post.author} · ${post.date} · ${post.interaction}  </div>
-                    </div>
-                `).join("");
-            })
-            .catch(error => console.error("Failed to load posts:", error));
-    });
-</script>
+        // 页面完全加载后，才应用渐变背景，防止闪屏
+        window.addEventListener("load", function() {
+            document.body.style.background = "linear-gradient(135deg, #ff0000, #ff7300, #ffeb00, #47e500, #00e5c0, #008cff, #4b00ff, #ff00c8)";
+        });
+
+        // 模拟 API 获取数据并渲染帖子
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch("/api/posts")
+                .then(response => response.json())
+                .then(posts => {
+                    const postList = document.getElementById("postList");
+                    postList.innerHTML = posts.map(post => `
+                        <div class="post">
+                            <h2>${post.title}</h2>
+                            <div class="divider"></div>
+                            <p>${post.content}</p>
+                            <div class="author">${post.author} · ${post.date} · ${post.interaction}  </div>
+                        </div>
+                    `).join("");
+                })
+                .catch(error => console.error("Failed to load posts:", error));
+        });
+    </script>
 
 </body>
 </html>
