@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>节点改名</title>
     <style>
-        /* Reset some default styles */
+        
         * {
             margin: 0;
             padding: 0;
@@ -77,37 +77,36 @@
             color: red;
             line-height: 1.5;
         }
-
-        /* 自定义复选框样式（未勾选时透明，勾选后变蓝） */
+        
         input[type="checkbox"] {
             width: 20px;
             height: 20px;
-            appearance: none; /* 隐藏默认样式 */
-            border: 2px solid #333; /* 默认边框 */
-            border-radius: 4px; /* 圆角 */
-            background-color: transparent; /* 未选中时透明 */
+            appearance: none; 
+            border: 2px solid #333; 
+            border-radius: 4px; 
+            background-color: transparent; 
             cursor: pointer;
             position: relative;
         }
 
         input[type="checkbox"]:checked {
-            background-color: #007bff; /* 选中后背景变蓝 */
+            background-color: #007bff; 
             border-color: #007bff;
         }
 
         input[type="checkbox"]::before {
-            content: "✔"; /* 伪元素添加对勾 */
+            content: "✔"; 
             font-size: 16px;
-            color: white; /* 勾选符号颜色 */
+            color: white; 
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            display: none; /* 默认隐藏 */
+            display: none; 
         }
 
         input[type="checkbox"]:checked::before {
-            display: block; /* 选中后显示对勾 */
+            display: block; 
         }
 
         button[type="submit"] {
@@ -171,7 +170,6 @@
     </div>
 
     <script>
-        // 页面加载时获取当前配置
         window.onload = function() {
             fetch('/api/get-config')
                 .then(response => response.json())
@@ -186,7 +184,6 @@
                 });
         };
 
-        // 提交修改
         document.getElementById('configForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
