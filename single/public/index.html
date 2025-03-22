@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>简易论坛</title>
+    <title>风云论坛</title>
     <style>
         * {
             margin: 0;
@@ -13,34 +13,62 @@
         }
         body {
             padding: 20px;
-            transition: background-color 0.5s ease; /* 添加背景变化过渡效果 */
+            background: rgba(0, 0, 0, 0.6); /* 半透明深色背景 */
+            transition: background-color 0.5s ease;
+            display: flex;
+            justify-content: center;
         }
         .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
+            width: 100%;
+            max-width: 800px; /* 电脑时最大宽度 */
+            background: rgba(255, 255, 255, 0.8); /* 轻微透明 */
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
         }
         h1 {
             text-align: center;
             margin-bottom: 20px;
+            font-size: clamp(20px, 5vw, 32px); /* 适配不同屏幕大小 */
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         .post {
             padding: 15px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
         .post:last-child {
             border-bottom: none;
         }
         .post h2 {
-            font-size: 18px;
-            color: #333;
-            cursor: pointer;
+            font-size: clamp(16px, 4vw, 22px); /* 标题自适应 */
+            color: #FFD700;
+            margin-bottom: 5px;
+            transition: color 0.3s ease;
+        }
+        .post h2:hover, .post h2:active {
+            color: #FFA500; /* 悬停或触摸时变亮 */
         }
         .post p {
+            color: #333;
+            font-size: clamp(14px, 3.5vw, 18px);
+            line-height: 1.6;
+        }
+        .post .author {
+            font-size: clamp(12px, 3vw, 14px);
             color: #666;
-            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                max-width: 90%; /* 手机时减少宽度 */
+                padding: 15px;
+            }
         }
     </style>
 </head>
@@ -59,25 +87,13 @@
                     const postList = document.getElementById("postList");
                     postList.innerHTML = posts.map(post => `
                         <div class="post">
-                            <h2 onclick="alert('${post.content}')">${post.title}</h2>
-                            <p>${post.author} · ${new Date(post.date).toLocaleDateString()}</p>
+                            <h2>${post.title}</h2>
+                            <p>${post.content}</p>
+                            <div class="author">${post.author} · ${new Date(post.date).toLocaleDateString()}</div>
                         </div>
                     `).join("");
                 })
                 .catch(error => console.error("加载帖子失败:", error));
-
-            // 随机生成背景颜色
-            function getRandomColor() {
-                const letters = '0123456789ABCDEF';
-                let color = '#';
-                for (let i = 0; i < 6; i++) {
-                    color += letters[Math.floor(Math.random() * 16)];
-                }
-                return color;
-            }
-
-            // 设置背景颜色
-            document.body.style.backgroundColor = getRandomColor();
         });
     </script>
 
