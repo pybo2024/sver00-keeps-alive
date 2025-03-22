@@ -644,16 +644,30 @@ app.get("/outbounds", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "outbounds.html"));
 });
 
-const posts = [
-    { title: "《风云家规》", author: "风云管家", date: "2025-03-22", content: "这里是一个开放式的论坛论，大家可以讨论各种话题。" },
-    { title: "50年后，有人能帅过我吗？", author: "胡歌", date: "2025-03-21", content: "从没想过一个问题，50年后不知道有没有新人能超过我的帅？每天都在无比的焦虑中！" },
-    { title: "黄贺，王八蛋。", author: "打工人", date: "2025-01-12", content: "浙江温州鞋厂，老板黄贺王八蛋，带着小姨子跑路了，我们没有办法拿的鞋子抵工资！原价¥300 ¥400，现在通通¥20。大家帮帮我们！" },
-    { title: "清明节适合上坟吗？", author: "他乡遇故人", date: "2025-03-21", content: "已经三年没回家了，祖宗坟上的草都几米高了，马上要清明节了，不知道有没有和我一样为生活，而奔波无法回家的！" },
-    { title: "学习 JavaScript 的好方法", author: "饭奇骏", date: "2025-03-20", content: "推荐一些学习 JS 的好资源，比如 MDN、LeetCode 等。" }
-];
+// 获取 Hacker News 热门帖子
+app.get("/api/posts", async (req, res) => {
+    try {
+        const { data } = await axios.get("https://hacker-news.firebaseio.com/v0/topstories.json");
+        const topIds = data.slice(0, 10); // 获取前 10 条帖子
 
-app.get("/api/posts", (req, res) => {
-    res.json(posts);
+        const postPromises = topIds.map(id =>
+            axios.get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)
+        );
+
+        const postsData = await Promise.all(postPromises);
+        const posts = postsData.map(post => ({
+            title: post.data.title,
+            content: post.data.url ? `🔗 <a href="${post.data.url}" target="_blank">点击查看原帖</a>` : "（无内容）",
+            author: post.data.by,
+            date: new Date(post.data.time * 1000).toLocaleDateString(),
+            interaction: `👍 ${Math.floor(Math.random() * 100)}  💬 ${Math.floor(Math.random() * 50)}`
+        }));
+
+        res.json(posts);
+    } catch (error) {
+        console.error("获取 Hacker News 失败:", error);
+        res.status(500).json({ error: "获取数据失败" });
+    }
 });
 
 app.get("/", (req, res) => {
