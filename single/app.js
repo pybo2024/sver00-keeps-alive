@@ -238,17 +238,24 @@ app.get("/node", (req, res) => {
                         margin: 0;
                         padding: 0;
                         font-family: Arial, sans-serif;
-                        background-color: #f4f4f4;
-                        display: flex;
-                        justify-content: center;
                         align-items: center;
                         min-height: 100vh;
                         padding: 10px;
+                        background: linear-gradient(135deg,  
+                        #ff7300,  
+                        #ffeb00,  
+                        #47e500,  
+                        #00e5c0  
+                        ); 
+                        background-attachment: fixed;  
+                        background-size: 100% 100%;   
+                        display: flex;
+                        justify-content: center;
                     }
                     .content-container {
                         width: 90%;
                         max-width: 600px;
-                        background-color: #fff;
+                        background: rgba(255, 255, 255, 0.2);
                         padding: 15px;
                         border-radius: 8px;
                         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -265,7 +272,7 @@ app.get("/node", (req, res) => {
                         overflow-y: auto;
                         border: 1px solid #ccc;
                         padding: 8px;
-                        background-color: #f9f9f9;
+                        background-color: transparent;
                         box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
                         border-radius: 5px;
                         white-space: pre-wrap;
