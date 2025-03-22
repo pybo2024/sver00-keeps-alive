@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>风云科技论坛</title>
+    <title>Windstorm Technology Forum</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         }
         body {
             padding: 20px;
-            background: rgba(0, 0, 0, 0.6); /* 半透明深色背景 */
+            background: rgba(0, 0, 0, 0.6); /* Semi-transparent dark background */
             display: flex;
             justify-content: center;
             transition: background-color 0.5s ease;
@@ -21,7 +21,7 @@
         .container {
             width: 100%;
             max-width: 800px;
-            background: rgba(255, 255, 255, 0.4); /* 透明度增加 */
+            background: rgba(255, 255, 255, 0.4); /* Increased transparency */
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
@@ -39,16 +39,16 @@
         }
         .post h2 {
             font-size: clamp(16px, 4vw, 22px);
-            font-weight: bold; /* 标题加粗 */
-            color: black; /* 标题颜色 */
+            font-weight: bold; /* Bold title */
+            color: black; /* Title color */
             margin-bottom: 8px;
             transition: color 0.3s ease;
         }
         .post h2:hover {
-            color: #444; /* 悬停颜色加深 */
+            color: #444; /* Darker hover color */
         }
         .divider {
-            border-top: 2px dashed rgba(0, 0, 0, 0.6); /* 标题和内容之间的虚线 */
+            border-top: 2px dashed rgba(0, 0, 0, 0.6); /* Dashed line between title and content */
             margin: 8px 0;
         }
         .post p {
@@ -62,7 +62,7 @@
             margin-top: 5px;
         }
 
-        /* 响应式设计 */
+        /* Responsive design */
         @media (max-width: 600px) {
             body {
                 padding: 10px;
@@ -77,8 +77,8 @@
 <body>
 
     <div class="container">
-        <h1>风云科技论坛</h1>
-        <div id="postList">加载中...</div>
+        <h1>Windstorm Technology Forum</h1>
+        <div id="postList">Loading...</div>
     </div>
 
     <script>
@@ -96,7 +96,7 @@
                     </div>
                 `).join("");
             })
-            .catch(error => console.error("加载帖子失败:", error));
+            .catch(error => console.error("Failed to load posts:", error));
     });
 </script>
 
