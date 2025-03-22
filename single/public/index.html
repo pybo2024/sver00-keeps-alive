@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简易论坛</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            padding: 20px;
+            transition: background-color 0.5s ease; /* 添加背景变化过渡效果 */
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .post {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .post:last-child {
+            border-bottom: none;
+        }
+        .post h2 {
+            font-size: 18px;
+            color: #333;
+            cursor: pointer;
+        }
+        .post p {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>简易论坛</h1>
+        <div id="postList">加载中...</div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch("/api/posts")
+                .then(response => response.json())
+                .then(posts => {
+                    const postList = document.getElementById("postList");
+                    postList.innerHTML = posts.map(post => `
+                        <div class="post">
+                            <h2 onclick="alert('${post.content}')">${post.title}</h2>
+                            <p>${post.author} · ${new Date(post.date).toLocaleDateString()}</p>
+                        </div>
+                    `).join("");
+                })
+                .catch(error => console.error("加载帖子失败:", error));
+
+            // 随机生成背景颜色
+            function getRandomColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            // 设置背景颜色
+            document.body.style.backgroundColor = getRandomColor();
+        });
+    </script>
+
+</body>
+</html>
