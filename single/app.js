@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require("express");
 const { exec } = require("child_process");
 const util = require('util');
-const axios = require('axios');
 const fs = require("fs");
 const path = require("path");
 const app = express();
@@ -645,30 +644,58 @@ app.get("/outbounds", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "outbounds.html"));
 });
 
-// 获取 Hacker News 热门帖子
-app.get("/api/posts", async (req, res) => {
-    try {
-        const { data } = await axios.get("https://hacker-news.firebaseio.com/v0/topstories.json");
-        const topIds = data.slice(0, 10); // 获取前 10 条帖子
+app.get("/api/posts", (req, res) => {
+    function getRandomPost() {
+        const titles = [
+            "今天遇到了一件有趣的事情",
+            "请教一下 JavaScript 的问题",
+            "如何快速提高写作能力？",
+            "最近的一次旅行分享",
+            "有人用过 ChatGPT 写代码吗？",
+            "健身 3 个月的成果，分享心得",
+            "求推荐一本好书！",
+            "大家的副业都做什么？",
+            "AI 未来会取代人类吗？",
+            "投资理财的坑，你遇到过吗？"
+        ];
 
-        const postPromises = topIds.map(id =>
-            axios.get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)
-        );
+        const contents = [
+            "今天在地铁上听到一个陌生人讲述他的创业经历，真的挺励志的，感觉自己也应该做点什么了。",
+            "最近在学习 JavaScript，遇到一个奇怪的 bug，控制台没有报错，但功能就是不生效，有人遇到过吗？",
+            "每天坚持写 500 字，会不会提高自己的写作能力？有没有人试过？",
+            "上个月去了云南，第一次体验泸沽湖的日出，真的很震撼，建议大家有机会一定要去看看。",
+            "最近试着用 ChatGPT 帮忙写 Python 代码，发现它有时候给出的解法比我自己写的还简洁，太神奇了。",
+            "健身 3 个月了，从 80kg 瘦到了 70kg，虽然过程很艰辛，但看到成果还是很开心，分享一下我的训练计划。",
+            "最近在看《三体》，感觉刘慈欣的想象力太厉害了，有没有类似风格的书推荐？",
+            "大家最近有没有尝试做点副业？我是做闲鱼无货源的，发现还挺赚钱的，有人感兴趣吗？",
+            "人工智能的发展越来越快了，未来会不会真的影响到我们的工作？大家怎么看？",
+            "最近被坑了一次，买了一只基金，结果 3 天跌了 10%，投资理财真的不能盲目跟风。"
+        ];
 
-        const postsData = await Promise.all(postPromises);
-        const posts = postsData.map(post => ({
-            title: post.data.title,
-            content: post.data.url ? `🔗 <a href="${post.data.url}" target="_blank">点击查看原帖</a>` : "（无内容）",
-            author: post.data.by,
-            date: new Date(post.data.time * 1000).toLocaleDateString(),
-            interaction: `👍 ${Math.floor(Math.random() * 100)}  💬 ${Math.floor(Math.random() * 50)}`
-        }));
+        const authors = ["ryty1", "西瓜", "大厨", "iorjhg", "饭奇骏", "uehsgwg", "周九", "吴十", "郑十一", "何成光"];
 
-        res.json(posts);
-    } catch (error) {
-        console.error("获取 Hacker News 失败:", error);
-        res.status(500).json({ error: "获取数据失败" });
+        function getRandomTime() {
+            const timeOptions = [
+                "5分钟前", "20分钟前", "1小时前", "3小时前", "昨天", "2天前", "1周前"
+            ];
+            return timeOptions[Math.floor(Math.random() * timeOptions.length)];
+        }
+
+        function getRandomInteraction() {
+            return `👍 ${Math.floor(Math.random() * 100)}  💬 ${Math.floor(Math.random() * 50)}`;
+        }
+
+        return {
+            title: titles[Math.floor(Math.random() * titles.length)],
+            content: contents[Math.floor(Math.random() * contents.length)],
+            author: authors[Math.floor(Math.random() * authors.length)],
+            date: getRandomTime(),
+            interaction: getRandomInteraction()
+        };
     }
+
+    const posts = Array.from({ length: 10 }, getRandomPost);
+    res.json(posts);
 });
 
 app.get("/", (req, res) => {
