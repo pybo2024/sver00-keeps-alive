@@ -647,36 +647,59 @@ app.get("/outbounds", (req, res) => {
 app.get("/api/posts", (req, res) => {
     function getRandomPost() {
         const titles = [
-            "今天遇到了一件有趣的事情",
-            "请教一下 JavaScript 的问题",
-            "如何快速提高写作能力？",
-            "最近的一次旅行分享",
-            "有人用过 ChatGPT 写代码吗？",
-            "健身 3 个月的成果，分享心得",
-            "求推荐一本好书！",
-            "大家的副业都做什么？",
-            "AI 未来会取代人类吗？",
-            "投资理财的坑，你遇到过吗？"
+            "Something interesting happened today",
+            "I have a JavaScript question",
+            "How to quickly improve writing skills?",
+            "Sharing my recent trip",
+            "Has anyone used ChatGPT to write code?",
+            "3-month fitness results, sharing insights",
+            "Can anyone recommend a good book?",
+            "What side jobs are people doing?",
+            "Will AI replace humans in the future?",
+            "Have you ever encountered a pitfall in investing?",
+            "The importance of networking",
+            "My thoughts on the latest tech trends",
+            "How to stay productive while working from home",
+            "Building a startup from scratch",
+            "What are your goals for this year?",
+            "How to develop a growth mindset",
+            "Exploring the concept of work-life balance",
+            "Has anyone tried learning a new language recently?",
+            "How to manage stress effectively",
+            "A step-by-step guide to personal finance"
         ];
 
         const contents = [
-            "今天在地铁上听到一个陌生人讲述他的创业经历，真的挺励志的，感觉自己也应该做点什么了。",
-            "最近在学习 JavaScript，遇到一个奇怪的 bug，控制台没有报错，但功能就是不生效，有人遇到过吗？",
-            "每天坚持写 500 字，会不会提高自己的写作能力？有没有人试过？",
-            "上个月去了云南，第一次体验泸沽湖的日出，真的很震撼，建议大家有机会一定要去看看。",
-            "最近试着用 ChatGPT 帮忙写 Python 代码，发现它有时候给出的解法比我自己写的还简洁，太神奇了。",
-            "健身 3 个月了，从 80kg 瘦到了 70kg，虽然过程很艰辛，但看到成果还是很开心，分享一下我的训练计划。",
-            "最近在看《三体》，感觉刘慈欣的想象力太厉害了，有没有类似风格的书推荐？",
-            "大家最近有没有尝试做点副业？我是做闲鱼无货源的，发现还挺赚钱的，有人感兴趣吗？",
-            "人工智能的发展越来越快了，未来会不会真的影响到我们的工作？大家怎么看？",
-            "最近被坑了一次，买了一只基金，结果 3 天跌了 10%，投资理财真的不能盲目跟风。"
+            "I heard a stranger on the subway talking about his entrepreneurial experience, it was really inspiring, I feel like I should do something too.",
+            "I've been learning JavaScript recently and encountered a strange bug. The console doesn't show any errors, but the function just doesn't work. Has anyone encountered this?",
+            "If I write 500 words every day, will it improve my writing skills? Has anyone tried it?",
+            "I went to Yunnan last month, and experienced the sunrise at Lugu Lake for the first time. It was truly amazing, I highly recommend visiting if you get the chance.",
+            "I've been using ChatGPT to help write Python code, and sometimes the solutions it gives are even simpler than mine. It's amazing.",
+            "I've been working out for 3 months and have lost 10kg, from 80kg to 70kg. The process was tough, but I'm happy with the results. Here's my training plan.",
+            "I'm reading 'The Three-Body Problem' recently, and Liu Cixin's imagination is incredible. Does anyone have book recommendations with a similar style?",
+            "Has anyone tried doing a side job recently? I’m doing the no-inventory business on Xianyu, and it’s surprisingly profitable. Anyone interested?",
+            "AI development is speeding up. Will it really affect our jobs in the future? What do you think?",
+            "I got scammed recently. I bought a fund, and it dropped 10% in 3 days. Investment really shouldn’t be done blindly.",
+            "I recently joined a networking event, and I must say, it was a game-changer. Meeting new people with similar interests is so valuable.",
+            "I’ve been diving deep into the tech world lately and just wanted to share my thoughts on the latest trends like AI and blockchain. It’s a thrilling time!",
+            "I’ve been working remotely for a while now, and here are some of my tips for staying productive when you're at home all day.",
+            "Started working on a startup idea, and I’m learning a lot. Here's how I went from concept to execution. Any tips or advice for beginners?",
+            "This year, I’m focused on improving my personal growth. What are your top goals for 2025? Let’s share and motivate each other!",
+            "I’ve been reading a lot about the importance of having a growth mindset. How do you foster this kind of mindset in your life?",
+            "Lately, I’ve been thinking about how to better manage work-life balance. It’s not easy, but I believe small changes can make a huge difference.",
+            "Has anyone tried learning a new language lately? I just started learning Spanish. It’s tough but exciting!",
+            "Dealing with stress is something I’ve been focusing on recently. What are some effective strategies you use to manage stress in daily life?",
+            "I just put together a personal finance plan for the year. It’s a great way to get on track financially. Anyone else have a finance strategy they follow?"
         ];
 
-        const authors = ["ryty1", "西瓜", "大厨", "iorjhg", "饭奇骏", "uehsgwg", "周九", "吴十", "郑十一", "何成光"];
+        const authors = [
+            "ryty1", "Watermelon", "Chef", "iorjhg", "Fan Qijun", "uehsgwg", "Zhou Jiu", "Wu Shi", "Zheng Shiyi", "He Chenguang",
+            "Lily", "Jack", "Tom", "Maggie", "Sophie", "Luke", "Eva", "James", "Ella", "Daniel", "Sophia"
+        ];
 
         function getRandomTime() {
             const timeOptions = [
-                "5分钟前", "20分钟前", "1小时前", "3小时前", "昨天", "2天前", "1周前"
+                "5 minutes ago", "20 minutes ago", "1 hour ago", "3 hours ago", "yesterday", "2 days ago", "1 week ago"
             ];
             return timeOptions[Math.floor(Math.random() * timeOptions.length)];
         }
