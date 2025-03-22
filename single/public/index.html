@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>风云论坛</title>
+    <title>风云科技论坛</title>
     <style>
         * {
             margin: 0;
@@ -77,22 +77,22 @@
 <body>
 
     <div class="container">
-        <h1>风云论坛</h1>
+        <h1>风云科技论坛</h1>
         <div id="postList">加载中...</div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            fetch("/api/posts")
+            fetch("/api/posts")  // 这里调用你的后端 API
                 .then(response => response.json())
                 .then(posts => {
                     const postList = document.getElementById("postList");
                     postList.innerHTML = posts.map(post => `
                         <div class="post">
-                            <h2>${post.title}</h2>
+                            <h2 onclick="alert('${post.content}')">${post.title}</h2>
                             <div class="divider"></div>
                             <p>${post.content}</p>
-                            <div class="author">${post.author} · ${new Date(post.date).toLocaleDateString()}</div>
+                            <div class="author">${post.author} · ${new Date(post.date).toLocaleDateString()} · ${post.interaction}</div>
                         </div>
                     `).join("");
                 })
