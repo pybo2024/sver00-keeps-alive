@@ -9,12 +9,20 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f6f9;
             color: #333;
             display: flex;
-            justify-content: center;
             align-items: center;
             height: 100vh;
+            background: linear-gradient(135deg,  
+            #ff7300,  
+            #ffeb00,  
+            #47e500,  
+            #00e5c0  
+            ); 
+            background-attachment: fixed;  
+            background-size: 100% 100%;   
+            display: flex;
+            justify-content: center;
         }
 
         h1 {
@@ -28,7 +36,7 @@
             max-width: 600px;
             width: 100%;
             padding: 20px;
-            background-color: white;
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
@@ -87,6 +95,7 @@
             width: calc(100% - 20px); 
             border-radius: 5px;
             border: 1px solid #ddd;
+            background-color: transparent;
         }
 
         input:focus {
