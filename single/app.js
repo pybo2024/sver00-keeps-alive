@@ -659,7 +659,7 @@ app.get("/", (req, res) => {
 });
 
 app.use((req, res, next) => {
-    const validPaths = ["/"，"/info", "/hy2ip", "/node", "/log", "/newset", "/config", "/outbounds"];
+    const validPaths = ["/", "/info", "/hy2ip", "/node", "/log", "/newset", "/config", "/outbounds"];
     if (validPaths.includes(req.path)) {
         return next();
     }
