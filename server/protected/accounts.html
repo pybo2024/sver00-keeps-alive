@@ -7,15 +7,22 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
             text-align: center;
             margin: 0;
             padding: 0;
+            background: linear-gradient(135deg,  
+                #ff7300,  
+                #ffeb00,  
+                #47e500,  
+                #00e5c0  
+            ); 
+            background-attachment: fixed;  
+            background-size: 100% 100%;   
         }
         .container {
             max-width: 800px;
             margin: 40px auto;
-            background: white;
+            background: rgba(255, 255, 255, 0.3);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -36,6 +43,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             outline: none;
+            background-color: transparent;
         }
         .btn {
             padding: 10px 15px;
@@ -70,6 +78,7 @@
             border-collapse: collapse;
             margin-top: 10px;
             position: relative;
+            background: transparent;
         }
         th, td {
             padding: 8px;
@@ -78,7 +87,7 @@
             text-align: center;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: transparent;
         }
         th:first-child, td:first-child {
             text-align: left;
@@ -98,6 +107,7 @@
         select {
             padding: 5px;
             font-size: 14px;
+            background-color: transparent;
         }
         .action-buttons {
             display: flex;
@@ -107,7 +117,7 @@
         thead {
             position: sticky;
             top: 0;
-            background-color: #f2f2f2;
+            background-color: transparent;
             z-index: 1;
         }
     </style>
