@@ -82,23 +82,24 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            fetch("/api/posts")  // 这里调用你的后端 API
-                .then(response => response.json())
-                .then(posts => {
-                    const postList = document.getElementById("postList");
-                    postList.innerHTML = posts.map(post => `
-                        <div class="post">
-                            <h2 onclick="alert('${post.content}')">${post.title}</h2>
-                            <div class="divider"></div>
-                            <p>${post.content}</p>
-                            <div class="author">${post.author} · ${new Date(post.date).toLocaleDateString()} · ${post.interaction}</div>
-                        </div>
-                    `).join("");
-                })
-                .catch(error => console.error("加载帖子失败:", error));
-        });
-    </script>
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch("/api/posts")
+            .then(response => response.json())
+            .then(posts => {
+                const postList = document.getElementById("postList");
+                postList.innerHTML = posts.map(post => `
+                    <div class="post">
+                        <h2>${post.title}</h2>
+                        <div class="divider"></div>
+                        <p>${post.content}</p>
+                        <div class="author">${post.author} · ${post.date}</div>
+                        <div class="interaction">${post.interaction}</div>
+                    </div>
+                `).join("");
+            })
+            .catch(error => console.error("加载帖子失败:", error));
+    });
+</script>
 
 </body>
 </html>
