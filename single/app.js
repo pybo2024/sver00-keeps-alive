@@ -644,8 +644,22 @@ app.get("/outbounds", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "outbounds.html"));
 });
 
+const posts = [
+    { title: "《风云家规》", author: "风云管家", date: "2025-03-22", content: "这里是一个开放式的论坛论，大家可以讨论各种话题。" },
+    { title: "50年后，有人能帅过我吗？", author: "胡歌", date: "2025-03-21", content: "从没想过一个问题，50年后不知道有没有新人能超过我的帅？每天都在无比的焦虑中！" },
+    { title: "学习 JavaScript 的好方法", author: "饭奇骏", date: "2025-03-20", content: "推荐一些学习 JS 的好资源，比如 MDN、LeetCode 等。" }
+];
+
+app.get("/api/posts", (req, res) => {
+    res.json(posts);
+});
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 app.use((req, res, next) => {
-    const validPaths = ["/info", "/hy2ip", "/node", "/log", "/newset", "/config", "/outbounds"];
+    const validPaths = ["/"，"/info", "/hy2ip", "/node", "/log", "/newset", "/config", "/outbounds"];
     if (validPaths.includes(req.path)) {
         return next();
     }
