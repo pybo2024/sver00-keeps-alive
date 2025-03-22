@@ -14,17 +14,17 @@
         body {
             padding: 20px;
             background: rgba(0, 0, 0, 0.6); /* 半透明深色背景 */
-            transition: background-color 0.5s ease;
             display: flex;
             justify-content: center;
+            transition: background-color 0.5s ease;
         }
         .container {
             width: 100%;
             max-width: 800px;
-            background: rgba(255, 255, 255, 0.4); /* 透明度加大 */
+            background: rgba(255, 255, 255, 0.4); /* 透明度增加 */
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.15); /* 轻微阴影，减少沉重感 */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
         }
         h1 {
             text-align: center;
@@ -37,21 +37,22 @@
             padding: 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
-        .post:last-child {
-            border-bottom: none;
-        }
         .post h2 {
             font-size: clamp(16px, 4vw, 22px);
             font-weight: bold; /* 标题加粗 */
-            color: black; /* 标题变黑 */
-            margin-bottom: 5px;
+            color: black; /* 标题颜色 */
+            margin-bottom: 8px;
             transition: color 0.3s ease;
         }
-        .post h2:hover, .post h2:active {
-            color: #333; /* 悬停或触摸时稍微变深 */
+        .post h2:hover {
+            color: #444; /* 悬停颜色加深 */
+        }
+        .divider {
+            border-top: 2px dashed rgba(0, 0, 0, 0.6); /* 标题和内容之间的虚线 */
+            margin: 8px 0;
         }
         .post p {
-            color: #222; /* 让内容比背景更清晰 */
+            color: #222;
             font-size: clamp(14px, 3.5vw, 18px);
             line-height: 1.6;
         }
@@ -76,7 +77,7 @@
 <body>
 
     <div class="container">
-        <h1>简易论坛</h1>
+        <h1>风云论坛</h1>
         <div id="postList">加载中...</div>
     </div>
 
@@ -89,6 +90,7 @@
                     postList.innerHTML = posts.map(post => `
                         <div class="post">
                             <h2>${post.title}</h2>
+                            <div class="divider"></div>
                             <p>${post.content}</p>
                             <div class="author">${post.author} · ${new Date(post.date).toLocaleDateString()}</div>
                         </div>
