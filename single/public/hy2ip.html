@@ -9,18 +9,25 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
             align-items: center;
             height: 100vh;
             width: 100vw;
             overflow: hidden;
+            background: linear-gradient(135deg,  
+            #ff7300,  
+            #ffeb00,  
+            #47e500,  
+            #00e5c0  
+            ); 
+            background-attachment: fixed;  
+            background-size: 100% 100%;   
+            display: flex;
+            justify-content: center;
         }
         .container {
             width: 95%;
             max-width: 600px;
-            background-color: #fff;
+            background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -47,12 +54,14 @@
             margin-bottom: 15px;
             text-align: center;
             transition: 0.3s;
+            background: transparent;
         }
         input[type="text"]:focus {
-            border-color: #007bff;
+            border-color: transparent;
             outline: none;
-            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
         }
+
         button {
             width: 100%;
             padding: 12px;
@@ -100,7 +109,7 @@
             overflow-y: auto;
             border: 1px solid #ccc;
             padding: 10px;
-            background-color: #f9f9f9;
+            background: transparent;
             border-radius: 4px;
         }
         p {
