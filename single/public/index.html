@@ -12,21 +12,31 @@
             font-family: Arial, sans-serif;
         }
 
-        /* 先用纯色背景，避免加载时出现闪屏 */
+        /* 预加载纯色背景，避免 Loading 时的扭曲 */
         body {
             padding: 20px;
-            background: #000; /* 预加载纯黑背景 */
+            background: #000; /* 初始黑色背景 */
             background-attachment: fixed;
-            background-size: 400% 400%;
+            background-size: cover;
             display: flex;
             justify-content: center;
-            transition: background 0.5s ease-in-out;
+            transition: background 1s ease-in-out;
+        }
+
+        /* 预加载隐藏的渐变背景，防止加载时的突变 */
+        #preload-bg {
+            position: absolute;
+            top: -9999px;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #ff0000, #ff7300, #ffeb00, #47e500, #00e5c0, #008cff, #4b00ff, #ff00c8);
+            visibility: hidden;
         }
 
         .container {
             width: 100%;
             max-width: 800px;
-            background: rgba(255, 255, 255, 0.4); /* 半透明背景 */
+            background: rgba(255, 255, 255, 0.4);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
@@ -89,18 +99,29 @@
 </head>
 <body>
 
+    <!-- 预加载隐藏背景 -->
+    <div id="preload-bg"></div>
+
     <div class="container">
         <h1>Windstorm Technology Forum</h1>
         <div id="postList">Loading...</div>
     </div>
 
     <script>
-        // 页面完全加载后，才应用渐变背景，防止闪屏
+        // 页面加载完成后，将隐藏的渐变背景应用到 body，避免加载时扭曲
         window.addEventListener("load", function() {
-            document.body.style.background = "linear-gradient(135deg, #ff0000, #ff7300, #ffeb00, #47e500, #00e5c0, #008cff, #4b00ff, #ff00c8)";
+            document.body.style.background = document.getElementById("preload-bg").style.background;
         });
 
-        // 模拟 API 获取数据并渲染帖子
+        // 延迟 200ms 应用背景，避免视觉突变
+        window.addEventListener("DOMContentLoaded", function() {
+            document.body.style.transition = "background 1s ease-in-out";
+            setTimeout(() => {
+                document.body.style.background = "linear-gradient(135deg, #ff0000, #ff7300, #ffeb00, #47e500, #00e5c0, #008cff, #4b00ff, #ff00c8)";
+            }, 200);
+        });
+
+        // 模拟 API 获取数据
         document.addEventListener("DOMContentLoaded", () => {
             fetch("/api/posts")
                 .then(response => response.json())
@@ -111,7 +132,7 @@
                             <h2>${post.title}</h2>
                             <div class="divider"></div>
                             <p>${post.content}</p>
-                            <div class="author">${post.author} · ${post.date} · ${post.interaction}  </div>
+                            <div class="author">${post.author} · ${post.date} · ${post.interaction}</div>
                         </div>
                     `).join("");
                 })
