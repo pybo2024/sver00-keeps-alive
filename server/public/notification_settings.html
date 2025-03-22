@@ -7,17 +7,24 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            background: linear-gradient(135deg,  
+                #ff7300,  
+                #ffeb00,  
+                #47e500,  
+                #00e5c0  
+            ); 
+            background-attachment: fixed;  
+            background-size: 100% 100%;   
         }
 
         .container {
-            background-color: #fff;
+            background: rgba(255, 255, 255, 0.2);
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -47,11 +54,13 @@
             border-radius: 4px;
             font-size: 16px;
             box-sizing: border-box;
+            background-color: transparent;
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: #007bff;
+            background-color: transparent;
         }
 
         button {
