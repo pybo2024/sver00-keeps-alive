@@ -14,19 +14,26 @@
 
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
             color: #333;
-            display: flex;
-            justify-content: center;
             align-items: center;
             min-height: 100vh;
+            background: linear-gradient(135deg,  
+            #ff7300,  
+            #ffeb00,  
+            #47e500,  
+            #00e5c0  
+            ); 
+            background-attachment: fixed;  
+            background-size: 100% 100%;   
+            display: flex;
+            justify-content: center;
         }
 
         .container {
-            background-color: #fff;
+            background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             width: 350px;
             text-align: left;
         }
@@ -40,10 +47,12 @@
 
         form {
             font-size: 1rem;
+            background-color: transparent;
         }
 
         .form-group {
             margin-bottom: 15px;
+            background-color: transparent;
         }
 
         label {
@@ -51,15 +60,17 @@
             margin-bottom: 8px;
             display: block;
             font-size: 1.1rem;
+            background: transparent;
         }
 
         input[type="text"], input[type="checkbox"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
-            border: 1px solid #ccc;
+            border: 1px solid rgba(0, 0, 0, 0.1);
             border-radius: 5px;
             font-size: 1rem;
+            background-color: transparent;
         }
          p {
             font-size: 12px; /* 减小字体大小 */
@@ -69,6 +80,7 @@
         input[type="checkbox"] {
             width: auto;
             margin-right: 10px;
+            background-color: transparent;
         }
 
         button[type="submit"] {
@@ -93,7 +105,7 @@
 
         input[type="text"]:focus, input[type="checkbox"]:focus {
             outline: none;
-            border-color: #007bff;
+            background-color: transparent;
         }
 
         @media (max-width: 400px) {
