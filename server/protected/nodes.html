@@ -74,20 +74,20 @@
             border-radius: 5px;
             background-color: transparent;
             text-align: left;
-            width: 97%; /* 在小屏幕上确保左右有均匀留白 */
+            width: 97%;
             height: 300px;
             overflow: auto;
-            white-space: pre-wrap; /* 保持换行 */
-            color: black; /* 采集到的节点字体颜色为黑色 */
+            white-space: pre-wrap;
+            color: black;
             font-size: 14px;
             position: relative;
             display: flex;
             flex-direction: column;
-            align-items: flex-start; /* 让内容靠顶部 */
+            align-items: flex-start;
             margin: auto;
         }
         .default-text {
-            color: #666666; /* 灰黑色字体 */
+            color: #666666;
             text-align: left;
             padding-left: 5px;
             padding-top: 0px;
@@ -168,21 +168,14 @@
         const allNodesDiv = document.getElementById("allNodes");
         const defaultTextDiv = document.getElementById("defaultText");
 
-        // 设置订阅链接
         subLinkInput.value = `https://${location.hostname}/sub`;
 
         function startNodesSummary() {
-            const loader = document.createElement("span");
-            loader.classList.add("loader");
-            loader.style.display = "inline-block"; 
-
-            startContent.innerText = ""; 
-            startContent.appendChild(loader); 
-
             startBtn.classList.add("btn-disabled");
             startBtn.disabled = true;
+            startContent.innerText = "采集中..."; // 更改按钮文字
 
-            socket.emit("startNodesSummary");
+            socket.emit("startNodesSummary"); // 向服务器请求节点采集
         }
 
         function copyNodes() {
@@ -211,13 +204,12 @@
             if (allNodes.length > 0) {
                 nodesText = allNodes.join("\n");
                 allNodesDiv.innerText = nodesText;
-                allNodesDiv.style.color = "black"; // 采集到的节点字体为黑色
+                allNodesDiv.style.color = "black"; 
             } else {
                 allNodesDiv.innerText = "没有成功的资源。";
                 nodesText = "";
             }
 
-            // 隐藏默认说明
             defaultTextDiv.style.display = "none";
 
             if (data.failedAccounts && data.failedAccounts.length > 0) {
@@ -226,7 +218,7 @@
                 failedAccountsDiv.innerHTML = "暂无失败账号";
             }
 
-            startContent.innerText = "开始采集"; 
+            startContent.innerText = "节点采集"; 
             startBtn.classList.remove("btn-disabled");
             startBtn.disabled = false;
         });
