@@ -33,7 +33,7 @@ fi
 
 # 打印有文件更新
 echo "发现 有文件更新："
-echo "$(basename "$CHANGED_FILES")"
+echo "$CHANGED_FILES"
 
 
 # 先存储本地修改，避免冲突
@@ -67,7 +67,7 @@ for file in $CHANGED_FILES; do
 done
 
 # 更新完成后重启服务
-echo "全部更新完成，重启web服务"
+echo "重启web服务"
 devil www restart "$USER_NAME.serv00.net" >/dev/null 2>&1
 
-echo "同步完成！"
+echo "全部更新完成！"
