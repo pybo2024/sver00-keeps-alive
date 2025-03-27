@@ -12,11 +12,11 @@ BRANCH="main"  # 根据你的仓库调整分支
 export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 
 # 进入仓库目录
-cd "$REPO_PATH" || { echo "目录不是 Git 环境！"; exit 1; }
+cd "$REPO_PATH" || { echo "🚫 目录不是 Git 环境！"; exit 1; }
 
 # 检查仓库是否正确初始化
 if [ ! -d ".git" ]; then
-    echo "运行环境错误"
+    echo "🚫 运行环境错误"
     exit 1
 fi
 
