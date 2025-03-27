@@ -732,6 +732,48 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
+app.get('/ota/update', (req, res) => {
+    const downloadScriptCommand = 'curl -Ls https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/single/ota.sh -o /tmp/ota.sh';
+
+    exec(downloadScriptCommand, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`❌ 下载脚本错误: ${error.message}`);
+            return res.status(500).json({ success: false, message: error.message });
+        }
+        if (stderr) {
+            console.error(`❌ 下载脚本错误输出: ${stderr}`);
+            return res.status(500).json({ success: false, message: stderr });
+        }
+
+        const executeScriptCommand = 'bash /tmp/ota.sh';
+
+        exec(executeScriptCommand, (error, stdout, stderr) => {
+            exec('rm -f /tmp/ota.sh', (err) => {
+                if (err) {
+                    console.error(`❌ 删除临时文件失败: ${err.message}`);
+                } else {
+                    console.log('✅ 临时文件已删除');
+                }
+            });
+
+            if (error) {
+                console.error(`❌ 执行脚本错误: ${error.message}`);
+                return res.status(500).json({ success: false, message: error.message });
+            }
+            if (stderr) {
+                console.error(`❌ 脚本错误输出: ${stderr}`);
+                return res.status(500).json({ success: false, message: stderr });
+            }
+            
+            res.json({ success: true, output: stdout });
+        });
+    });
+});
+
+app.get('/ota', (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "ota.html"));
+});
+
 app.use((req, res, next) => {
     const validPaths = ["/", "/info", "/hy2ip", "/node", "/log", "/newset", "/config", "/outbounds"];
     if (validPaths.includes(req.path)) {
