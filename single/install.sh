@@ -1,19 +1,19 @@
 #!/bin/bash
 
 X() {
-    local Y=$1 
-    local CMD=$2  
-    local O=("▖" "▘" "▝" "▗") 
-    local i=0  
+    local Y=$1
+    local CMD=$2
+    local O=("▖" "▘" "▝" "▗")
+    local i=0
 
     printf "[ ] %s" "$Y"
 
     eval "$CMD" > /dev/null 2>&1 &
-    local PID=$!  
-
+    local PID=$!
+    
     while kill -0 "$PID" 2>/dev/null; do
         printf "\r[%s] %s" "${O[i]}" "$Y"
-        i=$(( (i + 1) % 4 ))  
+        i=$(( (i + 1) % 4 ))
         sleep 0.1
     done
 
@@ -34,7 +34,7 @@ W="$V.serv00.net"
 A1="/home/$U/domains/$W"
 A2="$A1/public_nodejs"
 B1="$A2/public"
-A3="https://github.com/ryty1/serv00-save-me/archive/refs/heads/main.zip"
+A3="https://github.com/ryty1/serv00-save-me.git"
 
 echo "请选择保活类型："
 echo "1. 本机保活"
@@ -81,33 +81,37 @@ fi
 cd "$A2" && npm init -y > /dev/null 2>&1
 X "安装 环境依赖" "npm install $DEPENDENCIES"
 
-X "下载 配置文件" "wget \"$A3\" -O \"$A2/main.zip\""
+# 使用 sparse-checkout 来只拉取指定文件夹
+cd && git clone --no-checkout "$A3" "$HOME/serv00-save-me" > /dev/null 2>&1
+cd "$HOME/serv00-save-me" || exit 1
 
-unzip -q "$A2/main.zip" -d "$A2" > /dev/null 2>&1
-B1="$A2/serv00-save-me-main"
-if [[ -d "$B1" ]]; then
-    mv "$B1"/* "$A2/"
-    rm -rf "$B1"
-fi
-rm -f "$A2/README.md"
-rm -f "$A2/main.zip"
+# 配置 sparse-checkout，拉取指定文件夹
+git sparse-checkout init --cone
+git sparse-checkout set "$TARGET_FOLDER"  # 只拉取 single 或 server 文件夹
 
-if [[ -d "$A2/$TARGET_FOLDER" ]]; then
-    cp -r "$A2/$TARGET_FOLDER/." "$A2/"
-    rm -rf "$A2/$TARGET_FOLDER"
+
+# 拉取完成后，删除仓库的临时文件夹
+git checkout main > /dev/null 2>&1
+cd "$HOME" || exit 1
+
+# 复制拉取到的文件到目标目录并保留结构
+if [[ -d "$HOME/serv00-save-me" ]]; then
+    cp -r "$HOME/serv00-save-me/$TARGET_FOLDER/." "$A2/"
 else
     exit 1
 fi
 
-if [[ -d "$A2/$DELETE_FOLDER" ]]; then
-    rm -rf "$A2/$DELETE_FOLDER"
-fi
+# 复制到目标目录
+X "下载 配置文件"
 
+rm -f "$HOME/serv00-save-me/README.md"
+
+# 删除不需要的文件
 if [[ "$choice" -eq 1 ]]; then
-    rm -f "$A2/install.sh"
-    rm -f "$A2/hy2ip.sh"
+    for file in "$A2/install.sh" "$A2/hy2ip.sh" "$HOME/serv00-save-me/single/install.sh" "$HOME/serv00-save-me/single/hy2ip.sh"; do
+        rm -f "$file"
+    done
     chmod 755 "$A2/app.js" > /dev/null 2>&1
-
     echo ""
     echo " ┌───────────────────────────────────────────────────┐ "
     echo " │ 【 恭 喜 】  本机保活 部署已完成                  │ "
@@ -118,7 +122,9 @@ if [[ "$choice" -eq 1 ]]; then
     echo ""
 
 else
-    rm -f "$A2/ota.sh"
+    for file in "$A2/ota.sh" "$HOME/serv00-save-me/server/ota.sh"; do
+        rm -f "$file"
+    done
     chmod 755 "$A2/app.js" > /dev/null 2>&1
 
     echo ""
@@ -133,6 +139,7 @@ else
     echo ""
 fi
 
+# 如果时区被修改，提示用户重新登录
 if [[ "$TZ_MODIFIED" -eq 1 ]]; then
     echo " ┌───────────────────────────────────────────────────┐ "
     echo " │   全部安装完成，还需其它操作请重登陆              │ "
