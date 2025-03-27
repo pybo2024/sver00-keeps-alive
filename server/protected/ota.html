@@ -52,7 +52,7 @@
                 font-size: 22px;
             }
         h2 {
-                text-align: center;
+                text-align: left;
                 font-size: 14px;
                 color: red;
             }
@@ -110,7 +110,6 @@
 <body>
     <div class="container">
         <h1>OTA 更新</h1>
-        <h2>毛用没有，就装个逼，没有更新</h2>
         <button onclick="checkForUpdates()">检查更新</button>
         <div id="result"></div>
     </div>
@@ -123,7 +122,7 @@
 
                 if (data.success) {
                     const resultHtml = `
-                        <h3>更新结果</h3>
+                        <h2>更新结果</h2>
                         <pre>${data.output}</pre>
                     `;
                     document.getElementById('result').innerHTML = resultHtml;
