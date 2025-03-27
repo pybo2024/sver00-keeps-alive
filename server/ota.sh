@@ -33,7 +33,7 @@ fi
 
 # 打印有文件更新
 echo "发现 有文件更新："
-echo "$(basename "$CHANGED_FILES")"
+echo "$CHANGED_FILES"
 
 
 # 先存储本地修改，避免冲突
