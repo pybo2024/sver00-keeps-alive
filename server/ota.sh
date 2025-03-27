@@ -3,7 +3,7 @@
 # 配置变量
 USER=$(whoami)
 USER_NAME=$(echo "$USER" | tr '[:upper:]' '[:lower:]')  # 获取当前用户名并转换为小写
-REPO_PATH="/home/$USER/serv00-save-me"
+REPO_PATH="$HOME/serv00-save-me"
 SERVER_PATH="$REPO_PATH/server"
 TARGET_PATH="/home/$USER/domains/$USER_NAME.serv00.net/public_nodejs"
 BRANCH="main"  # 根据你的仓库调整分支
@@ -33,7 +33,7 @@ fi
 
 # 打印有文件更新
 echo "发现 有文件更新："
-echo "$CHANGED_FILES"
+echo "$(basename "$CHANGED_FILES")"
 
 
 # 先存储本地修改，避免冲突
@@ -56,7 +56,10 @@ for file in $CHANGED_FILES; do
     # 如果是文件删除（在仓库中删除），则删除目标路径的文件
     if ! git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
         if [ -f "$TARGET_FILE" ]; then
-            rm -f "$TARGET_FILE"  # 删除文件
+            for file in "$TARGET_FILE" "$SERVER_PATH/ota.sh" "$REPO_PATH/README.md"; do
+        rm -f "$file"
+    done
+
             echo "清理无效文件：$(basename "$TARGET_FILE")"
         fi
     else
