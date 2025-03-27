@@ -1,129 +1,149 @@
 #!/bin/bash
 
-USER_NAME=$(whoami)
-DOMAIN_NAME="${USER_NAME,,}.serv00.net"
-BASE_DIR="/home/$USER_NAME/domains/$DOMAIN_NAME"
-NODEJS_DIR="$BASE_DIR/public_nodejs"
-LOCAL_FILE_LIST="$NODEJS_DIR/file_list.txt"
-LOCAL_VERSION_FILE="$NODEJS_DIR/version.txt"
+X() {
+    local Y=$1
+    local CMD=$2
+    local O=("▖" "▘" "▝" "▗")
+    local i=0
 
-REMOTE_DIR_URL="https://raw.githubusercontent.com/ryty1/serv00-save-me/main/server/"
-TIMESTAMP="?t=$(date +%s)"
-REMOTE_FILE_LIST_URL="${REMOTE_DIR_URL}file_list.txt${TIMESTAMP}"
-REMOTE_VERSION_URL="${REMOTE_DIR_URL}version.txt${TIMESTAMP}"
+    printf "[ ] %s" "$Y"
 
-get_remote_version() {
-    curl -s "$REMOTE_VERSION_URL" | tr -d '\r'
-}
-
-get_local_version() {
-    if [ ! -f "$LOCAL_VERSION_FILE" ]; then
-        echo "0.0.0"  
-    else
-        cat "$LOCAL_VERSION_FILE" | tr -d '\r'
-    fi
-}
-
-get_remote_file_list() {
-    curl -s "$REMOTE_FILE_LIST_URL"
-}
-
-get_local_file_list() {
-    cat "$LOCAL_FILE_LIST"
-}
-
-download_file() {
-    local file_path="$1"
-    local full_path="$NODEJS_DIR/$file_path"
-
-    curl -sL --fail -o "$full_path" "${REMOTE_DIR_URL}${file_path}${TIMESTAMP}" && \
-    echo "✅ ${file_path} 更新完成" || \
-    echo "❌ 下载失败: ${file_path}"
-}
-
-delete_local_file() {
-    local file_path="$1"
-    rm -f "$NODEJS_DIR/$file_path"
-    echo "❌ ${file_path} 已删除"
-}
-
-update_local_file_list() {
-    local new_file_list=$1
-    echo "$new_file_list" > "$LOCAL_FILE_LIST"
-}
-
-is_remote_version_higher() {
-    local remote_version=$1
-    local local_version=$2
-
-    if [[ "$remote_version" > "$local_version" ]]; then
-        return 0  
-    else
-        return 1  
-    fi
-}
-
-
-install_dependencies() {
-    echo "🛠️ 正在安装依赖..."
-    cd "$NODEJS_DIR" && npm init -y > /dev/null 2>&1
-    npm install body-parser express-session session-file-store dotenv express socket.io node-cron node-telegram-bot-api axios > /dev/null 2>&1
-    echo "✅ 依赖安装完成"
-}
-
-
-sync_files() {
-    local files_updated=false
-
-    remote_files=$(get_remote_file_list)
-    local_files=$(get_local_file_list)
-
-    for file in $remote_files; do
-        download_file "$file"
-        files_updated=true
+    eval "$CMD" > /dev/null 2>&1 &
+    local PID=$!
+    
+    while kill -0 "$PID" 2>/dev/null; do
+        printf "\r[%s] %s" "${O[i]}" "$Y"
+        i=$(( (i + 1) % 4 ))
+        sleep 0.1
     done
 
-    for file in $local_files; do
-        if ! echo "$remote_files" | grep -q "^$file$"; then
-            delete_local_file "$file"
-            files_updated=true
-        fi
+    wait "$PID"
+    local EXIT_CODE=$?
+
+    printf "\r                       \r"
+    if [[ $EXIT_CODE -eq 0 ]]; then
+        printf "[\033[0;32mOK\033[0m] %s\n" "$Y"
+    else
+        printf "[\033[0;31mNO\033[0m] %s\n" "$Y"
+    fi
+}
+
+U=$(whoami)
+V=$(echo "$U" | tr '[:upper:]' '[:lower:]')
+W="$V.serv00.net"
+A1="/home/$U/domains/$W"
+A2="$A1/public_nodejs"
+B1="$A2/public"
+A3="https://github.com/ryty1/serv00-save-me.git"
+
+echo "请选择保活类型："
+echo "1. 本机保活"
+echo "2. 账号服务"
+read -p "请输入选择(1 或 2): " choice
+
+if [[ "$choice" -eq 1 ]]; then
+    TARGET_FOLDER="single"
+    DELETE_FOLDER="server"
+    DEPENDENCIES="dotenv basic-auth express"
+    echo "开始进行 本机保活配置"
+elif [[ "$choice" -eq 2 ]]; then
+    TZ_MODIFIED=0
+    if [[ "$(date +%Z)" != "CST" ]]; then
+        export TZ='Asia/Shanghai'
+        echo "export TZ='Asia/Shanghai'" >> ~/.profile
+        source ~/.profile
+        TZ_MODIFIED=1
+    fi
+    
+    TARGET_FOLDER="server"
+    DELETE_FOLDER="single"
+    DEPENDENCIES="body-parser express-session session-file-store dotenv express socket.io node-cron node-telegram-bot-api axios"
+    echo "开始进行 账号服务配置"
+else
+    echo "无效选择，退出脚本"
+    exit 1
+fi
+
+echo " ———————————————————————————————————————————————————————————— "
+
+X "删除 默认域名" "cd && devil www del \"$W\""
+
+if [[ -d "$A1" ]]; then
+    rm -rf "$A1"
+fi
+
+X "创建 类型域名" "devil www add \"$W\" nodejs /usr/local/bin/node22"
+
+if [[ -d "$B1" ]]; then
+    rm -rf "$B1"
+fi
+
+cd "$A2" && npm init -y > /dev/null 2>&1
+X "安装 环境依赖" "npm install $DEPENDENCIES"
+
+# 使用 sparse-checkout 来只拉取指定文件夹
+cd && git clone --no-checkout "$A3" "$HOME/serv00-save-me" > /dev/null 2>&1
+cd "$HOME/serv00-save-me" || exit 1
+
+# 配置 sparse-checkout，拉取指定文件夹
+git sparse-checkout init --cone
+git sparse-checkout set "$TARGET_FOLDER"  # 只拉取 single 或 server 文件夹
+
+
+# 拉取完成后，删除仓库的临时文件夹
+git checkout main > /dev/null 2>&1
+cd "$HOME" || exit 1
+
+# 复制拉取到的文件到目标目录并保留结构
+if [[ -d "$HOME/serv00-save-me" ]]; then
+    cp -r "$HOME/serv00-save-me/$TARGET_FOLDER/." "$A2/"
+else
+    exit 1
+fi
+
+# 复制到目标目录
+X "下载 配置文件"
+
+rm -f "$HOME/serv00-save-me/README.md"
+
+# 删除不需要的文件
+if [[ "$choice" -eq 1 ]]; then
+    for file in "$A2/install.sh" "$A2/hy2ip.sh" "$HOME/serv00-save-me/single/install.sh" "$HOME/serv00-save-me/single/hy2ip.sh"; do
+        rm -f "$file"
     done
+    chmod 755 "$A2/app.js" > /dev/null 2>&1
+    echo ""
+    echo " ┌───────────────────────────────────────────────────┐ "
+    echo " │ 【 恭 喜 】  本机保活 部署已完成                  │ "
+    echo " ├───────────────────────────────────────────────────┤ "
+    echo " │  保活地址：                                       │ "
+    printf " │  → %-46s │\n" "https://$W/info"
+    echo " └───────────────────────────────────────────────────┘ "
+    echo ""
 
-    update_local_file_list "$remote_files"
+else
+    for file in "$A2/ota.sh" "$HOME/serv00-save-me/server/ota.sh"; do
+        rm -f "$file"
+    done
+    chmod 755 "$A2/app.js" > /dev/null 2>&1
 
-    if $files_updated; then
-        return 0 
-    else
-        return 1 
-    fi
-}
+    echo ""
+    echo " ┌───────────────────────────────────────────────────┐ "
+    echo " │ 【 恭 喜 】  账号服务 部署已完成                  │ "
+    echo " ├───────────────────────────────────────────────────┤ "
+    echo " │  账号服务 只要部署1个，多了无用                   │ "
+    echo " ├───────────────────────────────────────────────────┤ "
+    echo " │  服务地址：                                       │ "
+    printf " │  → %-46s │\n" "https://$W/"
+    echo " └───────────────────────────────────────────────────┘ "
+    echo ""
+fi
 
-display_versions() {
-    local remote_version=$(get_remote_version)
-    local local_version=$(get_local_version)
-
-    echo "📌 当前版本: $local_version  |  📌 最新版本: $remote_version"
-}
-
-check_version_and_sync() {
-    local remote_version=$(get_remote_version)
-    local local_version=$(get_local_version)
-
-    display_versions
-
-    if is_remote_version_higher "$remote_version" "$local_version"; then
-        echo "🔄 发现新版本，开始安装依赖并同步文件..."
-        install_dependencies
-        if sync_files; then
-            echo "$remote_version" > "$LOCAL_VERSION_FILE"
-            echo "📢 版本更新完成，新版本号: $remote_version"
-        else
-            echo "❌ 文件同步失败，未更新任何文件。"
-        fi
-    else
-        echo "🔝 当前已是最新版本，无需更新。"
-    fi
-}
-
-check_version_and_sync
+# 如果时区被修改，提示用户重新登录
+if [[ "$TZ_MODIFIED" -eq 1 ]]; then
+    echo " ┌───────────────────────────────────────────────────┐ "
+    echo " │   全部安装完成，还需其它操作请重登陆              │ "
+    echo " └───────────────────────────────────────────────────┘ "
+    sleep 3
+    kill -9 $PPID
+fi
