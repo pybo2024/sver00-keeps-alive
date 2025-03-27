@@ -12,43 +12,43 @@ BRANCH="main"  # 根据你的仓库调整分支
 export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 
 # 进入仓库目录
-cd "$REPO_PATH" || { echo "目录不是 Git 环境！"; exit 1; }
+cd "$REPO_PATH" || { echo "🚫 目录不是 Git 环境！"; exit 1; }
 
 # 检查仓库是否正确初始化
 if [ ! -d ".git" ]; then
-    echo "运行环境错误"
+    echo "🚫 运行环境错误"
     exit 1
 fi
 
 # 记录 single 目录下的变动文件，排除 .sh 和 .md 文件
-echo "检查 文件更新....."
+echo "⚙️ 检查 更新....."
 git fetch origin "$BRANCH" >/dev/null 2>&1
 CHANGED_FILES=$(git diff --name-only origin/"$BRANCH" -- single | grep -Ev '\.sh$|\.md$')
 
 # 如果没有文件变动，则退出
 if [ -z "$CHANGED_FILES" ]; then
-    echo "文件均为最新"
+    echo "✅ 文件均为最新"
     exit 0
 fi
 
 # 打印有文件更新
-echo "发现 有文件更新："
+echo "💡 发现 有文件更新："
 echo "$(basename "$CHANGED_FILES")"
 
 
 # 先存储本地修改，避免冲突
 git stash >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-    echo "更新失败！"
+    echo "🚫 更新失败！"
     exit 1
 fi
 
 # 拉取最新代码
-echo "拉取文件更新中....."
+echo "🔄 拉取文件更新中....."
 git reset --hard origin/"$BRANCH" >/dev/null 2>&1
 
 # 遍历变更的文件并复制到目标路径
-echo "正在更新文件中....."
+echo "🔄 正在更新文件中....."
 for file in $CHANGED_FILES; do
     RELATIVE_PATH=${file#SINGLE/}  # 去掉 "single/" 前缀
     TARGET_FILE="$TARGET_PATH/$RELATIVE_PATH"  # 保持相对路径一致
@@ -60,17 +60,17 @@ for file in $CHANGED_FILES; do
         rm -f "$file"
     done
 
-            echo "清理无效文件：$(basename "$TARGET_FILE")"
+            echo "🗑️ 清理无效文件：$(basename "$TARGET_FILE")"
         fi
     else
         # 复制文件
         cp -f "$single_PATH/$RELATIVE_PATH" "$TARGET_FILE"
-        echo "已更新：$(basename "$TARGET_FILE")"
+        echo "✅ 已更新：$(basename "$TARGET_FILE")"
     fi
 done    
 
 # 更新完成后重启服务
-echo "重启web服务"
+echo "🚀 重启web服务"
 devil www restart "$USER_NAME.serv00.net" >/dev/null 2>&1
 
-echo "全部更新完成！"
+echo "🎉 全部更新完成！"
