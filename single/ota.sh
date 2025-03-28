@@ -40,7 +40,7 @@ fi
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "💡 发现 有文件更新："
 for file in $CHANGED_FILES; do
-    RELATIVE_PATH=$(echo "$file" | sed 's/^single\///' | sed 's/^public\///')
+    RELATIVE_PATH=$(echo "$file" | sed -e 's/^single\///' -e 's/^public\///')
     echo "🎯 $RELATIVE_PATH"
 done"
 
