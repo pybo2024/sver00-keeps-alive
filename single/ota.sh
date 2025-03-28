@@ -16,30 +16,40 @@ cd "$REPO_PATH" || { echo "🚫 目录不是 Git 环境！"; exit 1; }
 
 # 检查仓库是否正确初始化
 if [ ! -d ".git" ]; then
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "🚫 运行环境错误"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     exit 1
 fi
 
 # 记录 single 目录下的变动文件，排除 .sh 和 .md 文件
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🔍 开始 检查更新....."
 git fetch origin "$BRANCH" >/dev/null 2>&1
 CHANGED_FILES=$(git diff --name-only origin/"$BRANCH" -- single | grep -Ev '\.sh$|\.md$')
 
 # 如果没有文件变动，则退出
 if [ -z "$CHANGED_FILES" ]; then
-    echo "✅ 文件均为最新"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "✅ 文件均为最新！"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     exit 0
 fi
 
 # 打印有文件更新
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "💡 发现 有文件更新："
-echo "🎯 $CHANGED_FILES"
-
+for file in $CHANGED_FILES; do
+    RELATIVE_PATH=$(echo "$file" | sed 's/^single\///' | sed 's/^public\///')
+    echo "🎯 $RELATIVE_PATH"
+done"
 
 # 先存储本地修改，避免冲突
 git stash >/dev/null 2>&1
 if [ $? -ne 0 ]; then
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "🚫 更新失败！"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     exit 1
 fi
 
@@ -48,15 +58,18 @@ echo "⚙️ 下载文件更新中....."
 git reset --hard origin/"$BRANCH" >/dev/null 2>&1
 
 # 遍历变更的文件并复制到目标路径
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🔄 正在更新文件中....."
 for file in $CHANGED_FILES; do
     RELATIVE_PATH=${file#SINGLE/}  # 去掉 "single/" 前缀
     TARGET_FILE="$TARGET_PATH/$RELATIVE_PATH"  # 保持相对路径一致
 
+    rm -f "$SINGLE_PATH/ota.sh" "$SINGLE_PATH/hy2ip.sh" "$SINGLE_PATH/install.sh" "$REPO_PATH/README.md";
+
     # 如果是文件删除（在仓库中删除），则删除目标路径的文件
     if ! git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
         if [ -f "$TARGET_FILE" ]; then
-            for file in "$TARGET_FILE" "$SINGLE_PATH/ota.sh" "$SINGLE_PATH/hy2ip.sh" "$SINGLE_PATH/install.sh" "$REPO_PATH/README.md"; do
+            for file in "$TARGET_FILE"; do
         rm -f "$file"
     done
 
@@ -70,7 +83,9 @@ for file in $CHANGED_FILES; do
 done    
 
 # 更新完成后重启服务
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🚀 重启web服务"
 devil www restart "$USER_NAME.serv00.net" >/dev/null 2>&1
-
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🎉 全部更新完成！"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
