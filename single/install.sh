@@ -108,7 +108,7 @@ rm -f "$HOME/serv00-save-me/README.md"
 
 # 删除不需要的文件
 if [[ "$choice" -eq 1 ]]; then
-    for file in "$A2/install.sh" "$A2/hy2ip.sh" "$HOME/serv00-save-me/single/install.sh" "$HOME/serv00-save-me/single/hy2ip.sh"; do
+    for file in "$A2/install.sh" "$A2/hy2ip.sh" "$HOME/serv00-save-me/single/install.sh" "$HOME/serv00-save-me/single/hy2ip.sh" "$HOME/serv00-save-me/single/ota.sh"; do
         rm -f "$file"
     done
     chmod 755 "$A2/app.js" > /dev/null 2>&1
