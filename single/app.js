@@ -43,22 +43,31 @@ function executeCommand(command, actionName, isStartLog = false) {
     });
 }
 
-function stopShellCommand() {
+async function stopShellCommand() {
+    console.log("stop 被调用");
     const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash killsing-box.sh`;
-    executeCommand(command, "killsing-box.sh", true);  
+    try {
+        await executeCommand(command, "killsing-box.sh");
+    } catch (err) {
+        console.error("stop 失败:", err);
+    }
 }
 
-function runShellCommand() {
+async function runShellCommand() {
+    console.log("start 被调用");
     const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash start.sh`;
-    executeCommand(command, "start.sh", true);
+    try {
+        await executeCommand(command, "start.sh");
+    } catch (err) {
+        console.error("start 失败:", err);
+    }
 }
 
 async function KeepAlive() {
     console.log("KeepAlive 被调用");
     const command = `cd ${process.env.HOME}/serv00-play/ && bash keepalive.sh`;
     try {
-        const result = await executeCommand(command, "keepalive.sh", true);
-        console.log("KeepAlive 执行结果:", result);
+        await executeCommand(command, "keepalive.sh");
     } catch (err) {
         console.error("KeepAlive 失败:", err);
     }
@@ -66,45 +75,12 @@ async function KeepAlive() {
 
 setInterval(KeepAlive, 20000);
 
-function executeCommand(command, actionName, isStartLog = false, callback) {
-    exec(command, (err, stdout, stderr) => {
-        const timestamp = new Date().toLocaleString();
-        if (err) {
-            logMessage(`${actionName} 执行失败: ${err.message}`);
-            if (callback) callback(err.message);
-            return;
-        }
-        if (stderr) {
-            logMessage(`${actionName} 执行标准错误输出: ${stderr}`);
-        }
-        const successMsg = `${actionName} 执行成功:\n${stdout}`;
-        logMessage(successMsg);
-        if (isStartLog) latestStartLog = successMsg;
-        if (callback) callback(stdout);
-    });
-}
-
-function runShellCommand(callback) {
-    const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash start.sh`;
-    executeCommand(command, "start.sh", true, callback);
-}
-
-function stopShellCommand(callback) {
-    const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash killsing-box.sh`;
-    executeCommand(command, "killsing-box.sh", true, callback);
-}
-
-function KeepAlive(callback) {
-    const command = `cd ${process.env.HOME}/serv00-play/ && bash keepalive.sh`;
-    executeCommand(command, "keepalive.sh", true, callback);
-}
-
 app.get("/info", (req, res) => {
-    runShellCommand((runResult) => {
-        KeepAlive((keepAliveResult) => {
-            res.sendFile(path.join(__dirname, "public", "info.html"));
-        });
-    });
+    res.sendFile(path.join(__dirname, "public", "info.html"));
+    setTimeout(async () => {
+        await runShellCommand();  
+        await KeepAlive();        
+    }, 1000);  
 });
 
 app.use(express.urlencoded({ extended: true }));
