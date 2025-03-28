@@ -3,7 +3,7 @@
 # 配置变量
 USER=$(whoami)
 USER_NAME=$(echo "$USER" | tr '[:upper:]' '[:lower:]')  # 获取当前用户名并转换为小写
-REPO_PATH="$HOME/serv00-save-me"
+REPO_PATH="/home/$USER/serv00-save-me"
 SINGLE_PATH="$REPO_PATH/single"
 TARGET_PATH="/home/$USER/domains/$USER_NAME.serv00.net/public_nodejs"
 BRANCH="main"  # 根据你的仓库调整分支
