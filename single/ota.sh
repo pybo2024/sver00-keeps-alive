@@ -3,7 +3,7 @@
 # 配置变量
 USER=$(whoami)
 USER_NAME=$(echo "$USER" | tr '[:upper:]' '[:lower:]')  # 获取当前用户名并转换为小写
-REPO_PATH="/home/$USER/serv00-save-me"
+REPO_PATH="$HOME/serv00-save-me"
 SINGLE_PATH="$REPO_PATH/single"
 TARGET_PATH="/home/$USER/domains/$USER_NAME.serv00.net/public_nodejs"
 BRANCH="main"  # 根据你的仓库调整分支
@@ -42,7 +42,7 @@ echo "💡 发现 有文件更新："
 for file in $CHANGED_FILES; do
     RELATIVE_PATH=$(echo "$file" | sed -e 's/^single\///' -e 's/^public\///')
     echo "🎯 $RELATIVE_PATH"
-done"
+done
 
 # 先存储本地修改，避免冲突
 git stash >/dev/null 2>&1
@@ -62,7 +62,7 @@ git reset --hard origin/"$BRANCH" >/dev/null 2>&1
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🔄 正在更新文件中....."
 for file in $CHANGED_FILES; do
-    RELATIVE_PATH=${file#SINGLE/}  # 去掉 "single/" 前缀
+    RELATIVE_PATH=${file#single/}  # 去掉 "single/" 前缀
     TARGET_FILE="$TARGET_PATH/$RELATIVE_PATH"  # 保持相对路径一致
 
     rm -f "$SINGLE_PATH/ota.sh" "$SINGLE_PATH/hy2ip.sh" "$SINGLE_PATH/install.sh" "$REPO_PATH/README.md";
@@ -70,15 +70,12 @@ for file in $CHANGED_FILES; do
     # 如果是文件删除（在仓库中删除），则删除目标路径的文件
     if ! git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
         if [ -f "$TARGET_FILE" ]; then
-            for file in "$TARGET_FILE"; do
-        rm -f "$file"
-    done
-
+            rm -f "$TARGET_FILE"
             echo "🗑️ 清理无效文件：$(basename "$TARGET_FILE")"
         fi
     else
         # 复制文件
-        cp -f "$single_PATH/$RELATIVE_PATH" "$TARGET_FILE"
+        cp -f "$SINGLE_PATH/$RELATIVE_PATH" "$TARGET_FILE"
         echo "✅ 已更新：$(basename "$TARGET_FILE")"
     fi
 done    
