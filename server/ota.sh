@@ -16,44 +16,43 @@ cd "$REPO_PATH" || { echo "🚫 目录不是 Git 环境！"; exit 1; }
 
 # 检查仓库是否正确初始化
 if [ ! -d ".git" ]; then
-    echo "---------------------------"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "🚫 运行环境错误"
-    echo "---------------------------"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     exit 1
 fi
 
 # 记录 server 目录下的变动文件，排除 .sh 和 .md 文件
-echo "---------------------------"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🔍 开始 检查更新....."
 git fetch origin "$BRANCH" >/dev/null 2>&1
 CHANGED_FILES=$(git diff --name-only origin/"$BRANCH" -- server | grep -Ev '\.sh$|\.md$')
 
 # 如果没有文件变动，则退出
 if [ -z "$CHANGED_FILES" ]; then
-    echo "---------------------------"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "✅ 文件均为最新！"
-    echo "---------------------------"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     exit 0
 fi
 
 # 打印有文件更新
-echo "---------------------------"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "💡 发现 有文件更新："
 for file in $CHANGED_FILES; do
     RELATIVE_PATH=$(echo "$file" | sed 's/^server\///' | sed 's/^protected\///')
     echo "🎯 $RELATIVE_PATH"
 done
 
-echo "---------------------------"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "⚙️ 下载文件更新中....."
-echo "---------------------------"
 
 # 先存储本地修改，避免冲突
 git stash >/dev/null 2>&1
 if [ $? -ne 0 ]; then
-    echo "---------------------------"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "🚫 更新失败！"
-    echo "---------------------------"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     exit 1
 fi
 
@@ -61,7 +60,7 @@ fi
 git reset --hard origin/"$BRANCH" >/dev/null 2>&1
 
 # 遍历变更的文件并复制到目标路径
-echo "---------------------------"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🔄 正在更新文件中....."
 for file in $CHANGED_FILES; do
     RELATIVE_PATH=${file#server/}  # 去掉 "server/" 前缀
@@ -73,7 +72,6 @@ for file in $CHANGED_FILES; do
     if ! git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
         if [ -f "$TARGET_FILE" ]; then
             rm -f "$TARGET_FILE"
-            echo "---------------------------"
             echo "🗑️ 清理无效文件：$(basename "$TARGET_FILE")"
         fi
     else
@@ -83,9 +81,9 @@ for file in $CHANGED_FILES; do
     fi
 done
 
-echo "---------------------------"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🚀 重启web服务"
 devil www restart "$USER_NAME.serv00.net" >/dev/null 2>&1
-echo "---------------------------"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🎉 全部更新完成！"
-echo "---------------------------"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
