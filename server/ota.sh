@@ -21,19 +21,19 @@ if [ ! -d ".git" ]; then
 fi
 
 # 记录 server 目录下的变动文件，排除 .sh 和 .md 文件
-echo "⚙️ 检查更新....."
+echo "🔍 开始 检查更新....."
 git fetch origin "$BRANCH" >/dev/null 2>&1
 CHANGED_FILES=$(git diff --name-only origin/"$BRANCH" -- server | grep -Ev '\.sh$|\.md$')
 
 # 如果没有文件变动，则退出
 if [ -z "$CHANGED_FILES" ]; then
-    echo "✅ 文件均为最新"
+    echo "✅ 文件均为最新！"
     exit 0
 fi
 
 # 打印有文件更新
 echo "💡 发现 有文件更新："
-echo "$CHANGED_FILES"
+echo "🎯 $CHANGED_FILES"
 
 
 # 先存储本地修改，避免冲突
@@ -44,7 +44,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # 拉取最新代码
-echo "🔄 拉取文件更新中....."
+echo "⚙️ 下载文件更新中....."
 git reset --hard origin/"$BRANCH" >/dev/null 2>&1
 
 # 遍历变更的文件并复制到目标路径
