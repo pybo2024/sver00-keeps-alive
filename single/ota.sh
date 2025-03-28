@@ -54,6 +54,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # 拉取最新代码
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "⚙️ 下载文件更新中....."
 git reset --hard origin/"$BRANCH" >/dev/null 2>&1
 
