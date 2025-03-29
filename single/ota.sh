@@ -23,8 +23,6 @@ if [ ! -d ".git" ]; then
 fi
 
 # 记录 single 目录下的变动文件，排除 .sh 和 .md 文件
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🔍 开始 检查更新....."
 git fetch origin "$BRANCH" >/dev/null 2>&1
 CHANGED_FILES=$(git diff --name-only origin/"$BRANCH" -- single | grep -Ev '\.sh$|\.md$')
 
@@ -54,13 +52,9 @@ if [ $? -ne 0 ]; then
 fi
 
 # 拉取最新代码
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "⚙️ 下载文件更新中....."
 git reset --hard origin/"$BRANCH" >/dev/null 2>&1
 
 # 遍历变更的文件并复制到目标路径
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🔄 正在更新文件中....."
 for file in $CHANGED_FILES; do
     RELATIVE_PATH=${file#single/}  # 去掉 "single/" 前缀
     TARGET_FILE="$TARGET_PATH/$RELATIVE_PATH"  # 保持相对路径一致
@@ -71,10 +65,12 @@ for file in $CHANGED_FILES; do
     if ! git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
         if [ -f "$TARGET_FILE" ]; then
             rm -f "$TARGET_FILE"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "🗑️ 清理无效文件：$(basename "$TARGET_FILE")"
         fi
     else
         # 复制文件
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         cp -f "$SINGLE_PATH/$RELATIVE_PATH" "$TARGET_FILE"
         echo "✅ 已更新：$(basename "$TARGET_FILE")"
     fi
