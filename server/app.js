@@ -613,8 +613,7 @@ app.get("/notificationSettings", isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, "public", "notification_settings.html"));
 });
 
-app.get('/ota/update', (req, res) => {
-    console.log("🚀 开始 OTA 更新...");
+app.get('/ota/update', isAuthenticated, (req, res) => {
 
     const downloadScriptCommand = 'curl -Ls -o /tmp/ota.sh https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/server/ota.sh';
 
@@ -624,7 +623,6 @@ app.get('/ota/update', (req, res) => {
             return res.status(500).json({ success: false, message: `下载失败: ${error.message}` });
         }
 
-        console.log("✅ 下载完成");
         const executeScriptCommand = 'bash /tmp/ota.sh';
 
         exec(executeScriptCommand, (error, stdout, stderr) => {
@@ -635,7 +633,6 @@ app.get('/ota/update', (req, res) => {
                 return res.status(500).json({ success: false, message: `执行失败: ${error.message}` });
             }
 
-            console.log("✅ 脚本执行完成");
             res.json({ success: true, output: stdout || '执行成功' });
         });
     });
