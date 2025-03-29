@@ -17,10 +17,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 let logs = [];
-let latestStartLog = "";
+let latestStartLog = [];
 function logMessage(message) {
     logs.push(message);
-    if (logs.length > 5) logs.shift();
+    if (logs.length > 2) logs.shift();
 }
 
 // 执行 Shell 命令
