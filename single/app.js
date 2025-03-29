@@ -233,8 +233,8 @@ app.get("/info", async (req, res) => {
 
     // 后端异步执行任务
     try {
-        await runShellCommand(); // 启动 SingBox
         await KeepAlive();       // 运行 KeepAlive
+        await runShellCommand(); // 启动 SingBox
     } catch (err) {
         console.error("后台任务执行失败:", err);
     }
