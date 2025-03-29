@@ -205,7 +205,7 @@ app.get("/info", async (req, res) => {
             <button onclick="window.location.href='/newset'">节点改名</button>
             <button onclick="window.location.href='/config'">配置修改</button>
             <button onclick="window.location.href='/outbounds'">配置出站</button>
-            <button onclick="window.location.href='/log'">查看日志</button>
+            <button onclick="window.location.href='/log'">日志进程</button>
             <button onclick="window.location.href='/ota'">检测更新</button>
         </div>
     </div>
