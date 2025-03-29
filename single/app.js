@@ -23,6 +23,7 @@ function logMessage(message) {
     if (logs.length > 5) logs.shift();
 }
 
+// 执行 Shell 命令
 function executeCommand(command, actionName, isStartLog = false) {
     return new Promise((resolve, reject) => {
         exec(command, (err, stdout, stderr) => {
@@ -43,16 +44,7 @@ function executeCommand(command, actionName, isStartLog = false) {
     });
 }
 
-async function stopShellCommand() {
-    console.log("stop 被调用");
-    const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash killsing-box.sh`;
-    try {
-        await executeCommand(command, "killsing-box.sh");
-    } catch (err) {
-        console.error("stop 失败:", err);
-    }
-}
-
+// 启动 SingBox
 async function runShellCommand() {
     console.log("start 被调用");
     const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash start.sh`;
@@ -63,6 +55,18 @@ async function runShellCommand() {
     }
 }
 
+// 停止 SingBox
+async function stopShellCommand() {
+    console.log("stop 被调用");
+    const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash killsing-box.sh`;
+    try {
+        await executeCommand(command, "killsing-box.sh");
+    } catch (err) {
+        console.error("stop 失败:", err);
+    }
+}
+
+// 保持 SingBox 存活
 async function KeepAlive() {
     console.log("KeepAlive 被调用");
     const command = `cd ${process.env.HOME}/serv00-play/ && bash keepalive.sh`;
@@ -75,12 +79,166 @@ async function KeepAlive() {
 
 setInterval(KeepAlive, 20000);
 
-app.get("/info", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "info.html"));
-    setTimeout(async () => {
-        await runShellCommand();  
-        await KeepAlive();        
-    }, 1000);  
+// 获取 /info 页面
+app.get("/info", async (req, res) => {
+    const htmlContent = `<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>系统状态</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg,  
+                #ff7300,  
+                #ffeb00,  
+                #47e500,  
+                #00e5c0  
+            ); 
+            background-attachment: fixed;  
+            background-size: 100% 100%;   
+            display: flex;
+            justify-content: center;
+        }
+
+        .content-container {
+            width: 95%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dynamic-text {
+            font-size: max(25px, 4vw);
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 5px;
+            line-height: 1.3;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        @keyframes growShrink {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .dynamic-text span {
+            display: inline-block;
+            animation: growShrink 1s infinite;
+            animation-delay: calc(0.08s * var(--char-index));
+        }
+
+        .button-container {
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
+            width: 100%; 
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 20px;
+            background-color: #4CAF50; 
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s;
+            width: 45%; 
+            min-width: 150px; 
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            background-color: #45a049; 
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            .dynamic-text {
+                font-size: max(18px, 5vw);
+            }
+
+            .button-container {
+                flex-direction: row; 
+                width: 100%; 
+            }
+
+            button {
+                font-size: 16px;
+                width: 45%; 
+                min-width: 120px; 
+            }
+
+            .content-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content-container">
+        <div class="dynamic-text" id="firstText"></div>
+        <div class="dynamic-text" id="secondText"></div>
+        <div class="button-container">
+            <button onclick="window.location.href='/hy2ip'">换HY2_IP</button>
+            <button onclick="window.location.href='/node'">节点信息</button>
+            <button onclick="window.location.href='/newset'">节点改名</button>
+            <button onclick="window.location.href='/config'">配置修改</button>
+            <button onclick="window.location.href='/outbounds'">配置出站</button>
+            <button onclick="window.location.href='/log'">查看日志</button>
+            <button onclick="window.location.href='/ota'">检测更新</button>
+            <button onclick="fetch('/stop').then(() => alert('SingBox 已停止'));">停止 SingBox</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstText = "SingBox 已 复 活";
+            const secondText = "HtmlOnLive 守护中";
+            function generateDynamicText(text, elementId) {
+                const element = document.getElementById(elementId);
+                element.innerHTML = text.split("").map((char, index) => 
+                    \`<span style="--char-index: \${index};">\${char}</span>\`
+                ).join("");
+            }
+
+            generateDynamicText(firstText, "firstText");
+            generateDynamicText(secondText, "secondText");
+        });
+    </script>
+</body>
+</html>`;
+
+    res.send(htmlContent);
+
+    // 后端异步执行任务
+    try {
+        await runShellCommand(); // 启动 SingBox
+        await KeepAlive();       // 运行 KeepAlive
+    } catch (err) {
+        console.error("后台任务执行失败:", err);
+    }
 });
 
 app.use(express.urlencoded({ extended: true }));
