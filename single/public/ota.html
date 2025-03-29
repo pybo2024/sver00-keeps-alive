@@ -46,82 +46,96 @@
         button:hover {
             background-color: #45a049;
         }
+        .btn-loading {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 2s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         h1 {
             text-align: center;
             color: #333;
             font-size: 22px;
-        }
-        h2 {
-            text-align: left;
-            font-size: 14px;
-            color: red;
         }
         #result {
             margin-top: 20px;
             font-size: 12px;
             word-wrap: break-word;
         }
-        /* 响应式布局 */
-        @media (max-width: 768px) {
-            .container {
-                width: 95%;
-                padding: 15px;
-            }
-            button {
-                font-size: 16px;
-            }
-            #result {
-                font-size: 13px;
-            }
+        .result-item {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 18px;
-            }
-            button {
-                font-size: 14px;
-            }
-            #result {
-                font-size: 12px;
-            }
+        .success {
+            background-color: #e7f9e7;
+            color: #4CAF50;
+        }
+        .failure {
+            background-color: #ffe6e6;
+            color: #f44336;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>OTA 更新</h1>
-        <button id="updateButton">检查更新</button>
+        <button id="updateBtn" onclick="checkForUpdates()">检查更新</button>
         <div id="result"></div>
     </div>
 
     <script>
-        document.getElementById('updateButton').addEventListener('click', async function() {
-            const button = document.getElementById('updateButton');
-            button.style.display = 'none'; // 立即隐藏按钮
-            
+        async function checkForUpdates() {
+            const updateBtn = document.getElementById("updateBtn");
+
+            // 创建加载动画
+            const loader = document.createElement("span");
+            loader.classList.add("loader");
+
+            // 禁用按钮并显示加载动画
+            updateBtn.classList.add("btn-loading");
+            updateBtn.innerHTML = '更新中';
+            updateBtn.appendChild(loader);
+            updateBtn.disabled = true;
+
             try {
-                console.log("🚀 开始请求后端更新...");
-                const response = await fetch('/ota/update', { cache: "no-store" });
+                const response = await fetch('/ota/update');
                 const data = await response.json();
-                
-                console.log("✅ 请求完成，解析响应数据...");
 
                 if (data.success) {
-                    document.getElementById('result').innerHTML = `
+                    const resultHtml = `
                         <h2>更新结果</h2>
                         <pre>${data.output}</pre>
                     `;
+                    document.getElementById('result').innerHTML = resultHtml;
                 } else {
-                    document.getElementById('result').innerHTML = '<p class="failure">更新失败: ' + data.message + '</p>';
+                    document.getElementById('result').innerHTML = '<p class="failure">更新时发生错误</p>';
                 }
             } catch (error) {
-                console.error("❌ 请求失败:", error);
-                document.getElementById('result').innerHTML = '<p class="failure">请求失败: ' + error.message + '</p>';
+                document.getElementById('result').innerHTML = '<p class="failure">请求失败</p>';
             } finally {
-                console.log("🔄 任务完成，恢复按钮");
-                button.style.display = 'block'; // 任务完成后恢复按钮
+                // 恢复按钮
+                updateBtn.innerHTML = '检查更新'; 
+                updateBtn.disabled = false;
+                updateBtn.classList.remove("btn-loading"); // 恢复按钮样式
             }
-        });
+        }
     </script>
 </body>
 </html>
