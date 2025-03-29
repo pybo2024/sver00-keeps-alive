@@ -7,12 +7,19 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: linear-gradient(135deg, #ff7300, #ffeb00, #47e500, #00e5c0);
-            background-attachment: fixed;
+            background: linear-gradient(135deg,  
+                #ff7300,  
+                #ffeb00,  
+                #47e500,  
+                #00e5c0  
+            ); 
+            background-attachment: fixed;  
             background-size: 100% 100%;
         }
         .container {
@@ -22,8 +29,8 @@
             background: rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            text-align: center;
         }
+
         button {
             display: block;
             margin: 20px auto;
@@ -34,24 +41,49 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 15px;
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #45a049;
         }
         h1 {
+            text-align: center;
             color: #333;
             font-size: 22px;
         }
+        h2 {
+            text-align: left;
+            font-size: 14px;
+            color: red;
+        }
         #result {
             margin-top: 20px;
-            font-size: 14px;
+            font-size: 12px;
             word-wrap: break-word;
         }
-        .info {
-            color: #0288d1;
+        /* 响应式布局 */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 15px;
+            }
+            button {
+                font-size: 16px;
+            }
+            #result {
+                font-size: 13px;
+            }
         }
-        .failure {
-            color: red;
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 18px;
+            }
+            button {
+                font-size: 14px;
+            }
+            #result {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -63,42 +95,27 @@
     </div>
 
     <script>
-        function checkForUpdates() {
+        async function checkForUpdates() {
             const button = document.getElementById('updateButton');
-            const resultDiv = document.getElementById('result');
+            button.style.display = 'none'; // 按钮立即消失
 
-            if (!button) {
-                console.error("按钮未找到！");
-                return;
-            }
+            try {
+                const response = await fetch('/ota/update', { cache: "no-store" });
+                const data = await response.json();
 
-            // 隐藏按钮
-            button.style.display = 'none';
-            resultDiv.innerHTML = '<p class="info">正在检查更新，请稍候...</p>';
-
-            console.log("按钮已隐藏，开始更新...");
-
-            // 模拟网络请求（3秒后返回结果）
-            setTimeout(async () => {
-                try {
-                    console.log("开始请求服务器...");
-                    
-                    const response = await fetch('/ota/update'); // 真实环境使用
-                    const data = await response.json(); // 解析 JSON
-
-                    if (data.success) {
-                        resultDiv.innerHTML = `<h2>更新结果</h2><pre>${data.output}</pre>`;
-                    } else {
-                        resultDiv.innerHTML = '<p class="failure">更新失败</p>';
-                    }
-                } catch (error) {
-                    console.error("请求出错:", error);
-                    resultDiv.innerHTML = '<p class="failure">请求失败</p>';
-                } finally {
-                    console.log("更新完成，恢复按钮...");
-                    button.style.display = 'block'; // 恢复按钮
+                if (data.success) {
+                    document.getElementById('result').innerHTML = `
+                        <h2>更新结果</h2>
+                        <pre>${data.output}</pre>
+                    `;
+                } else {
+                    document.getElementById('result').innerHTML = '<p class="failure">更新失败: ' + data.message + '</p>';
                 }
-            }, 3000); // 模拟 3 秒请求
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<p class="failure">请求失败: ' + error.message + '</p>';
+            } finally {
+                button.style.display = 'block'; // 任务完成后恢复按钮
+            }
         }
     </script>
 </body>
