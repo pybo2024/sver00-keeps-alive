@@ -17,10 +17,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 let logs = [];
-let latestStartLog = [];
 function logMessage(message) {
     logs.push(message);
-    if (logs.length > 2) logs.shift();
+    if (logs.length > 10) logs.shift();
 }
 
 // 执行 Shell 命令
@@ -311,26 +310,23 @@ app.post("/hy2ip/execute", (req, res) => {
 });
 
 app.get("/api/log", (req, res) => {
-    const command = "ps aux"; 
+    const command = "ps aux";
 
     exec(command, (err, stdout, stderr) => {
         if (err) {
             return res.json({
                 error: true,
                 message: `执行错误: ${err.message}`,
-                logs: "暂无日志",
+                logs: logs.length ? logs.slice(-2) : ["暂无日志"], // 只返回最近 2 条日志
                 processOutput: ""
             });
         }
 
-        const processOutput = stdout.trim(); 
-        const latestLog = logs[logs.length - 1] || "暂无日志";
-        
         res.json({
             error: false,
             message: "成功获取数据",
-            logs: latestLog,
-            processOutput: processOutput
+            logs: logs.length ? logs.slice(-2) : ["暂无日志"], // 只返回最近 2 条日志
+            processOutput: stdout.trim()
         });
     });
 });
