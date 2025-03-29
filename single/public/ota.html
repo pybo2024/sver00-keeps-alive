@@ -32,7 +32,9 @@
         }
 
         button {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin: 20px auto;
             padding: 10px 20px;
             background-color: #4CAF50;
@@ -42,20 +44,39 @@
             cursor: pointer;
             font-size: 15px;
             transition: background-color 0.3s;
+            position: relative;
         }
         button:hover {
             background-color: #45a049;
         }
+        button:disabled {
+            background-color: #a5a5a5;
+            cursor: not-allowed;
+        }
+        .loading-spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         h1 {
-                text-align: center;
-                color: #333;
-                font-size: 22px;
-            }
+            text-align: center;
+            color: #333;
+            font-size: 22px;
+        }
         h2 {
-                text-align: left;
-                font-size: 14px;
-                color: red;
-            }
+            text-align: left;
+            font-size: 14px;
+            color: red;
+        }
         #result {
             margin-top: 20px;
             font-size: 12px;
@@ -110,27 +131,40 @@
 <body>
     <div class="container">
         <h1>OTA 更新</h1>
-        <button onclick="checkForUpdates()">检查更新</button>
+        <button id="updateButton" onclick="checkForUpdates()">
+            检查更新
+            <div id="loadingSpinner" class="loading-spinner"></div>
+        </button>
         <div id="result"></div>
     </div>
 
     <script>
         async function checkForUpdates() {
+            const button = document.getElementById('updateButton');
+            const spinner = document.getElementById('loadingSpinner');
+
+            // 禁用按钮并显示加载动画
+            button.disabled = true;
+            spinner.style.display = "inline-block";
+
             try {
                 const response = await fetch('/ota/update');
                 const data = await response.json();
 
                 if (data.success) {
-                    const resultHtml = `
+                    document.getElementById('result').innerHTML = `
                         <h2>更新结果</h2>
                         <pre>${data.output}</pre>
                     `;
-                    document.getElementById('result').innerHTML = resultHtml;
                 } else {
                     document.getElementById('result').innerHTML = '<p class="failure">更新时发生错误</p>';
                 }
             } catch (error) {
                 document.getElementById('result').innerHTML = '<p class="failure">请求失败</p>';
+            } finally {
+                // 恢复按钮状态
+                button.disabled = false;
+                spinner.style.display = "none";
             }
         }
     </script>
