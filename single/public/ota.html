@@ -119,7 +119,7 @@
 
             // 禁用按钮并显示加载动画
             updateBtn.classList.add("btn-loading");
-            
+            updateBtn.innerHTML = '';
             updateBtn.appendChild(loader);
             updateBtn.disabled = true; // 禁用按钮，防止多次点击
 
