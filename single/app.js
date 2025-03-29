@@ -317,7 +317,7 @@ app.get("/api/log", (req, res) => {
             return res.json({
                 error: true,
                 message: `执行错误: ${err.message}`,
-                logs: logs.length ? logs.slice(-2) : ["暂无日志"], // 只返回最近 2 条日志
+                logs: logs.length ? logs.slice(-2).join("\n") : ["暂无日志"], // 只返回最近 2 条日志
                 processOutput: ""
             });
         }
@@ -325,7 +325,7 @@ app.get("/api/log", (req, res) => {
         res.json({
             error: false,
             message: "成功获取数据",
-            logs: logs.length ? logs.slice(-2) : ["暂无日志"], // 只返回最近 2 条日志
+            logs: logs.length ? logs.slice(-2).join("\n") : ["暂无日志"], // 只返回最近 2 条日志
             processOutput: stdout.trim()
         });
     });
