@@ -29,6 +29,7 @@
             background: rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
         }
 
         button {
@@ -46,24 +47,6 @@
         button:hover {
             background-color: #45a049;
         }
-        button:disabled {
-            background-color: #d3d3d3;
-            cursor: not-allowed;
-        }
-        .loading {
-            border: 3px solid #fff;
-            border-top: 3px solid transparent;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         h1 {
             text-align: center;
             color: #333;
@@ -135,30 +118,25 @@
     <script>
         async function checkForUpdates() {
             const button = document.getElementById('updateButton');
-            button.disabled = true; // 禁用按钮
-
-            const loadingCircle = document.createElement('div');
-            loadingCircle.classList.add('loading');
-            button.appendChild(loadingCircle); // 添加加载圆圈
+            button.style.display = 'none'; // 隐藏按钮
+            document.getElementById('result').innerHTML = '<p class="info">正在检查更新，请稍候...</p>';
 
             try {
                 const response = await fetch('/ota/update');
                 const data = await response.json();
 
                 if (data.success) {
-                    const resultHtml = `
+                    document.getElementById('result').innerHTML = `
                         <h2>更新结果</h2>
                         <pre>${data.output}</pre>
                     `;
-                    document.getElementById('result').innerHTML = resultHtml;
                 } else {
                     document.getElementById('result').innerHTML = '<p class="failure">更新时发生错误</p>';
                 }
             } catch (error) {
                 document.getElementById('result').innerHTML = '<p class="failure">请求失败</p>';
             } finally {
-                button.disabled = false; // 恢复按钮
-                button.removeChild(loadingCircle); // 移除加载圆圈
+                button.style.display = 'block'; // 恢复按钮
             }
         }
     </script>
