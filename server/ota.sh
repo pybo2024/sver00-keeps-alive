@@ -38,7 +38,7 @@ fi
 
 # 打印有文件更新
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "💡 发现 有文件更新："
+echo "💡 发现 有文件变动："
 for file in $CHANGED_FILES; do
     RELATIVE_PATH=$(echo "$file" | sed -e 's/^server\///' -e 's/^protected\///' -e 's/^public\///')
     echo "🎯 $RELATIVE_PATH"
