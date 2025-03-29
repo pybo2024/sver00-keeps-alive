@@ -25,6 +25,7 @@ fi
 # 记录 server 目录下的变动文件，排除 .sh 和 .md 文件
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🔍 开始 检查更新....."
+sleep 3
 git fetch origin "$BRANCH" >/dev/null 2>&1
 CHANGED_FILES=$(git diff --name-only origin/"$BRANCH" -- server | grep -Ev '\.sh$|\.md$')
 
@@ -44,6 +45,8 @@ for file in $CHANGED_FILES; do
     echo "🎯 $RELATIVE_PATH"
 done
 
+sleep 3
+
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "⚙️ 下载文件更新中....."
 
@@ -58,6 +61,8 @@ fi
 
 # 拉取最新代码
 git reset --hard origin/"$BRANCH" >/dev/null 2>&1
+
+sleep 3
 
 # 遍历变更的文件并复制到目标路径
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -81,9 +86,13 @@ for file in $CHANGED_FILES; do
     fi
 done
 
+sleep 2
+
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🚀 重启web服务"
 devil www restart "$USER_NAME.serv00.net" >/dev/null 2>&1
+
+sleep 2
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🎉 全部更新完成！"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
