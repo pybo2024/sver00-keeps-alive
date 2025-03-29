@@ -106,7 +106,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>OTA 更新</h1>
+        <h1>账号端 OTA 更新</h1>
         <button id="updateBtn" onclick="checkForUpdates()">检查更新</button>
         <div id="result"></div>
     </div>
@@ -124,7 +124,7 @@
             updateBtn.disabled = true; // 禁用按钮，防止多次点击
 
             // 将加载动画放在按钮内部
-            updateBtn.innerHTML = '';
+            
             updateBtn.appendChild(loader);
 
             try {
