@@ -208,7 +208,6 @@ app.get("/info", async (req, res) => {
             <button onclick="window.location.href='/outbounds'">配置出站</button>
             <button onclick="window.location.href='/log'">查看日志</button>
             <button onclick="window.location.href='/ota'">检测更新</button>
-            <button onclick="fetch('/stop').then(() => alert('SingBox 已停止'));">停止 SingBox</button>
         </div>
     </div>
 
