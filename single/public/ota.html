@@ -45,14 +45,14 @@
             cursor: pointer;
             font-size: 15px;
             transition: background-color 0.3s;
-            position: relative;
             min-width: 150px;
+            position: relative;
         }
         button:hover {
             background-color: #45a049;
         }
         button:disabled {
-            background-color: #a5a5a5;
+            background-color: #a5a5a5 !important;
             cursor: not-allowed;
         }
         .loading-spinner {
@@ -68,11 +68,6 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-        .button-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         h1 {
             color: #333;
@@ -104,17 +99,15 @@
 <body>
     <div class="container">
         <h1>OTA 更新</h1>
-        <button id="updateButton" onclick="checkForUpdates()">
-            <span class="button-content">
-                <span id="buttonText">检查更新</span>
-                <div id="loadingSpinner" class="loading-spinner"></div>
-            </span>
+        <button id="updateButton">
+            <span id="buttonText">检查更新</span>
+            <div id="loadingSpinner" class="loading-spinner"></div>
         </button>
         <div id="result"></div>
     </div>
 
     <script>
-        async function checkForUpdates() {
+        document.getElementById('updateButton').addEventListener('click', async function() {
             const button = document.getElementById('updateButton');
             const spinner = document.getElementById('loadingSpinner');
             const buttonText = document.getElementById('buttonText');
@@ -125,10 +118,10 @@
             spinner.style.display = "inline-block";
 
             try {
-                // 模拟请求（这里用 `setTimeout` 代替真实 `fetch` 请求）
+                // 模拟网络请求（2 秒）
                 await new Promise(resolve => setTimeout(resolve, 2000));
 
-                // 假设请求成功
+                // 伪造请求成功返回的数据
                 const data = { success: true, output: "更新完成！" };
 
                 if (data.success) {
@@ -147,7 +140,7 @@
                 buttonText.textContent = "检查更新";
                 spinner.style.display = "none";
             }
-        }
+        });
     </script>
 </body>
 </html>
