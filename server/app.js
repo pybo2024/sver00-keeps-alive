@@ -614,39 +614,29 @@ app.get("/notificationSettings", isAuthenticated, (req, res) => {
 });
 
 app.get('/ota/update', isAuthenticated, (req, res) => {
-    const downloadScriptCommand = 'curl -Ls https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/server/ota.sh -o /tmp/ota.sh';
+    console.log("🚀 开始 OTA 更新...");
+
+    const downloadScriptCommand = 'curl -Ls -o /tmp/ota.sh https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/server/ota.sh';
 
     exec(downloadScriptCommand, (error, stdout, stderr) => {
         if (error) {
-            console.error(`❌ 下载脚本错误: ${error.message}`);
-            return res.status(500).json({ success: false, message: error.message });
-        }
-        if (stderr) {
-            console.error(`❌ 下载脚本错误输出: ${stderr}`);
-            return res.status(500).json({ success: false, message: stderr });
+            console.error(`❌ 下载失败: ${error.message}`);
+            return res.status(500).json({ success: false, message: `下载失败: ${error.message}` });
         }
 
+        console.log("✅ 下载完成");
         const executeScriptCommand = 'bash /tmp/ota.sh';
 
         exec(executeScriptCommand, (error, stdout, stderr) => {
-            exec('rm -f /tmp/ota.sh', (err) => {
-                if (err) {
-                    console.error(`❌ 删除临时文件失败: ${err.message}`);
-                } else {
-                    console.log('✅ 临时文件已删除');
-                }
-            });
+            exec('rm -f /tmp/ota.sh', () => console.log('✅ 清理完成'));
 
             if (error) {
-                console.error(`❌ 执行脚本错误: ${error.message}`);
-                return res.status(500).json({ success: false, message: error.message });
+                console.error(`❌ 执行失败: ${error.message}`);
+                return res.status(500).json({ success: false, message: `执行失败: ${error.message}` });
             }
-            if (stderr) {
-                console.error(`❌ 脚本错误输出: ${stderr}`);
-                return res.status(500).json({ success: false, message: stderr });
-            }
-            
-            res.json({ success: true, output: stdout });
+
+            console.log("✅ 脚本执行完成");
+            res.json({ success: true, output: stdout || '执行成功' });
         });
     });
 });
