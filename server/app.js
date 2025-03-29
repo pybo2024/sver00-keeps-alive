@@ -614,51 +614,39 @@ app.get("/notificationSettings", isAuthenticated, (req, res) => {
 });
 
 app.get('/ota/update', isAuthenticated, (req, res) => {
-    res.setHeader('Content-Type', 'text/plain');
-    res.setHeader('Transfer-Encoding', 'chunked');
+    const downloadScriptCommand = 'curl -Ls https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/server/ota.sh -o /tmp/ota.sh';
 
-    // 下载脚本
-    const downloadProcess = spawn('curl', ['-Ls', 'https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/server/ota.sh', '-o', '/tmp/ota.sh']);
-
-    downloadProcess.stdout.on('data', (data) => {
-        res.write(`下载中: ${data}`);
-    });
-
-    downloadProcess.stderr.on('data', (data) => {
-        res.write(`下载错误: ${data}`);
-    });
-
-    downloadProcess.on('close', (code) => {
-        if (code !== 0) {
-            res.write(`❌ 下载脚本失败 (退出码 ${code})\n`);
-            return res.end();
+    exec(downloadScriptCommand, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`❌ 下载脚本错误: ${error.message}`);
+            return res.status(500).json({ success: false, message: error.message });
+        }
+        if (stderr) {
+            console.error(`❌ 下载脚本错误输出: ${stderr}`);
+            return res.status(500).json({ success: false, message: stderr });
         }
 
-        res.write('✅ 脚本下载完成，开始执行...\n');
+        const executeScriptCommand = 'bash /tmp/ota.sh';
 
-        // 执行脚本
-        const scriptProcess = spawn('bash', ['/tmp/ota.sh']);
-
-        scriptProcess.stdout.on('data', (data) => {
-            res.write(`输出: ${data}`);
-        });
-
-        scriptProcess.stderr.on('data', (data) => {
-            res.write(`错误: ${data}`);
-        });
-
-        scriptProcess.on('close', (code) => {
-            if (code !== 0) {
-                res.write(`❌ 脚本执行失败 (退出码 ${code})\n`);
-            } else {
-                res.write('✅ 脚本执行完成\n');
-            }
-
-            // 删除临时文件
-            spawn('rm', ['-f', '/tmp/ota.sh']).on('close', () => {
-                res.write('✅ 临时文件已删除\n');
-                res.end();
+        exec(executeScriptCommand, (error, stdout, stderr) => {
+            exec('rm -f /tmp/ota.sh', (err) => {
+                if (err) {
+                    console.error(`❌ 删除临时文件失败: ${err.message}`);
+                } else {
+                    console.log('✅ 临时文件已删除');
+                }
             });
+
+            if (error) {
+                console.error(`❌ 执行脚本错误: ${error.message}`);
+                return res.status(500).json({ success: false, message: error.message });
+            }
+            if (stderr) {
+                console.error(`❌ 脚本错误输出: ${stderr}`);
+                return res.status(500).json({ success: false, message: stderr });
+            }
+            
+            res.json({ success: true, output: stdout });
         });
     });
 });
