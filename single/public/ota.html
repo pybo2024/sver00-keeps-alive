@@ -90,18 +90,21 @@
 <body>
     <div class="container">
         <h1>OTA 更新</h1>
-        <button id="updateButton" onclick="checkForUpdates()">检查更新</button>
+        <button id="updateButton">检查更新</button>
         <div id="result"></div>
     </div>
 
     <script>
-        async function checkForUpdates() {
+        document.getElementById('updateButton').addEventListener('click', async function() {
             const button = document.getElementById('updateButton');
-            button.style.display = 'none'; // 按钮立即消失
-
+            button.style.display = 'none'; // 立即隐藏按钮
+            
             try {
+                console.log("🚀 开始请求后端更新...");
                 const response = await fetch('/ota/update', { cache: "no-store" });
                 const data = await response.json();
+                
+                console.log("✅ 请求完成，解析响应数据...");
 
                 if (data.success) {
                     document.getElementById('result').innerHTML = `
@@ -112,11 +115,13 @@
                     document.getElementById('result').innerHTML = '<p class="failure">更新失败: ' + data.message + '</p>';
                 }
             } catch (error) {
+                console.error("❌ 请求失败:", error);
                 document.getElementById('result').innerHTML = '<p class="failure">请求失败: ' + error.message + '</p>';
             } finally {
+                console.log("🔄 任务完成，恢复按钮");
                 button.style.display = 'block'; // 任务完成后恢复按钮
             }
-        }
+        });
     </script>
 </body>
 </html>
