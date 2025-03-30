@@ -490,7 +490,16 @@ async function sendCheckResultsToTG() {
 
         const beijingTime = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
         let message = `📢 账号检测结果：\n\`\`\`\n${results.join("\n")}\n\`\`\`\n⏰ 北京时间：${beijingTime}`;
-        await bot.sendMessage(settings.telegramChatId, message, { parse_mode: "MarkdownV2" });
+        const options = {
+            parse_mode: "MarkdownV2",
+            reply_markup: {
+                inline_keyboard: [
+                    [{ text: "账号检测", url: "https://checks.594880.xyz" }]
+                ]
+            }
+        };
+
+        await bot.sendMessage(settings.telegramChatId, message, options);
 
     } catch (error) {
         console.error("❌ 发送 Telegram 失败:", error);
