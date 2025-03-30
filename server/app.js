@@ -473,6 +473,7 @@ async function sendCheckResultsToTG() {
         let maxSeasonLength = 0;
 
         const users = Object.keys(data);  
+        const maxIndexLength = String(users.length).length;
 
         users.forEach(user => {
             maxUserLength = Math.max(maxUserLength, user.length);
@@ -480,10 +481,11 @@ async function sendCheckResultsToTG() {
         });
 
         users.forEach((user, index) => {
+            const paddedIndex = String(index + 1).padStart(maxIndexLength, "0");
             const paddedUser = user.padEnd(maxUserLength, " ");
             const season = (data[user]?.season || "--").padEnd(maxSeasonLength + 1, " ");
             const status = data[user]?.status || "未知状态";
-            results.push(`${index + 1}. ${paddedUser} : ${season}- ${status}`);
+            results.push(`${paddedIndex}. ${paddedUser} : ${season}- ${status}`);
         });
 
         const beijingTime = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
