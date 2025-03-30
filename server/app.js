@@ -489,7 +489,7 @@ async function sendCheckResultsToTG() {
         });
 
         const beijingTime = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
-        let message = `📢 账号检测结果：\n\`\`\`\n${results.join("\n")}\n\`\`\`\n⏰ 北京时间：${beijingTime}`;
+        let message = `📢 账号检测结果：\n\n\`\`\`\n${results.join("\n")}\n\`\`\`\n\n⏰ 北京时间：${beijingTime}`;
         const options = {
             parse_mode: "MarkdownV2",
             reply_markup: {
