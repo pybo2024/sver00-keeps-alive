@@ -78,18 +78,50 @@
             background-color: #0056b3;
         }
 
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
+        /* 滑动开关样式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
         }
 
-        .toggle-container input {
-            margin-left: 10px;
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
 
-        input[disabled] {
-            background-color: #f2f2f2;
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            border-radius: 24px;
+            transition: 0.4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.4s;
+        }
+
+        input:checked + .slider {
+            background-color: #007bff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
         }
     </style>
 </head>
@@ -98,14 +130,16 @@
         <h1>通知 & Telegram 设置</h1>
         
         <form id="notificationSettingsForm">
-            <label for="cronEnabled">启用 Cron 表达式:</label>
-            <div class="toggle-container">
-                <label for="cronEnabled">启用 Cron</label>
+            <label for="cronEnabled">启用 Cron 定时任务:</label>
+            <label class="switch">
                 <input type="checkbox" id="cronEnabled">
-            </div>
+                <span class="slider"></span>
+            </label>
 
-            <label for="cronExpression">Cron 表达式:</label>
-            <input type="text" id="cronExpression" placeholder="请输入 Cron 表达式 (例: * * * * *)" disabled required>
+            <label for="cronExpression">Cron 时间表达式:</label>
+            <input type="text" id="cronExpression" placeholder="请输入 Cron 表达式" disabled>
+
+            <hr>
 
             <label for="telegramToken">TG Bot_Token:</label>
             <input type="text" id="telegramToken" required placeholder="请输入 Token">
@@ -118,18 +152,18 @@
     </div>
 
     <script>
-        // 切换 Cron 启用状态
-        document.getElementById("cronEnabled").addEventListener("change", function() {
-            const cronInput = document.getElementById("cronExpression");
-            if (this.checked) {
-                cronInput.disabled = false;
-                cronInput.placeholder = "请输入 Cron 表达式 (例: * * * * *)";
-            } else {
-                cronInput.disabled = true;
-                cronInput.value = "";
+        function updateCronInputState() {
+            const cronEnabled = document.getElementById("cronEnabled").checked;
+            const cronExpressionInput = document.getElementById("cronExpression");
+
+            cronExpressionInput.disabled = !cronEnabled;
+            if (!cronEnabled) {
+                cronExpressionInput.value = ""; // 关闭时清空 Cron 表达式
             }
-        });
-        
+        }
+
+        document.getElementById("cronEnabled").addEventListener("change", updateCronInputState);
+
         fetch("/getNotificationSettings")
             .then(response => response.json())
             .then(data => {
@@ -137,13 +171,7 @@
                 document.getElementById("telegramChatId").value = data.telegramChatId || "";
                 document.getElementById("cronEnabled").checked = data.cronEnabled || false;
                 document.getElementById("cronExpression").value = data.cronExpression || "";
-                
-                // 根据存储的状态，设置 Cron 输入框是否启用
-                if (data.cronEnabled) {
-                    document.getElementById("cronExpression").disabled = false;
-                } else {
-                    document.getElementById("cronExpression").disabled = true;
-                }
+                updateCronInputState();
             })
             .catch(error => console.error("获取设置失败:", error));
         
