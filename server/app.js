@@ -391,7 +391,7 @@ app.get('/sub', (req, res) => {
     }
 });
 
-let cronJob = null; 
+let cronJob = null;
 
 function getNotificationSettings() {
     if (!fs.existsSync(SETTINGS_FILE)) return {};
@@ -402,37 +402,25 @@ function saveNotificationSettings(settings) {
     fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2));
 }
 
-function getCronExpression(scheduleType, timeValue) {
-    if (scheduleType === "interval") {
-        const minutes = parseInt(timeValue, 10);
-        if (isNaN(minutes) || minutes <= 0) return null;
-        return `*/${minutes} * * * *`;
-    } else if (scheduleType === "daily") {
-        const [hour, minute] = timeValue.split(":").map(num => parseInt(num, 10));
-        if (isNaN(hour) || isNaN(minute)) return null;
-        return `${minute} ${hour} * * *`;
-    } else if (scheduleType === "weekly") {
-        const [day, time] = timeValue.split("-");
-        const [hour, minute] = time.split(":").map(num => parseInt(num, 10));
-        const weekDays = { "周日": 0, "周一": 1, "周二": 2, "周三": 3, "周四": 4, "周五": 5, "周六": 6 };
-        if (!weekDays.hasOwnProperty(day) || isNaN(hour) || isNaN(minute)) return null;
-        return `${minute} ${hour} * * ${weekDays[day]}`;
-    }
-    return null;
-}
-
 function resetCronJob() {
-    if (cronJob) cronJob.stop(); 
+    if (cronJob) {
+        cronJob.stop();
+        cronJob = null;
+    }
+
     const settings = getNotificationSettings();
-    if (!settings || !settings.scheduleType || !settings.timeValue) return;
+    if (!settings || !settings.cronEnabled || !settings.cronExpression) return;
 
-    const cronExpression = getCronExpression(settings.scheduleType, settings.timeValue);
-    if (!cronExpression) return console.error("无效的 cron 表达式");
+    if (!cron.validate(settings.cronExpression)) {
+        return console.error("❌ 无效的 cron 表达式:", settings.cronExpression);
+    }
 
-    cronJob = cron.schedule(cronExpression, () => {
-        console.log("⏰ 运行账号检测任务...");
+    cronJob = cron.schedule(settings.cronExpression, () => {
+        console.log("⏰ 运行通知任务...");
         sendCheckResultsToTG();
     });
+
+    console.log("✅ 定时任务已启动:", settings.cronExpression);
 }
 
 app.post("/setTelegramSettings", (req, res) => {
@@ -595,22 +583,24 @@ app.post("/checkAccounts", async (req, res) => {
     }
 });
 
+// 获取通知设置
 app.get("/getNotificationSettings", (req, res) => {
     res.json(getNotificationSettings());
 });
 
+// 设置通知参数
 app.post("/setNotificationSettings", (req, res) => {
-    const { telegramToken, telegramChatId, scheduleType, timeValue } = req.body;
-    
-    if (!telegramToken || !telegramChatId || !scheduleType || !timeValue) {
-        return res.status(400).json({ message: "所有字段都是必填项" });
+    const { telegramToken, telegramChatId, cronEnabled, cronExpression } = req.body;
+
+    if (!telegramToken || !telegramChatId) {
+        return res.status(400).json({ message: "Token 和 Chat ID 不能为空" });
     }
 
-    if (!getCronExpression(scheduleType, timeValue)) {
-        return res.status(400).json({ message: "时间格式不正确，请检查输入" });
+    if (cronEnabled && (!cronExpression || !cron.validate(cronExpression))) {
+        return res.status(400).json({ message: "无效的 Cron 表达式" });
     }
 
-    const settings = { telegramToken, telegramChatId, scheduleType, timeValue };
+    const settings = { telegramToken, telegramChatId, cronEnabled, cronExpression };
     saveNotificationSettings(settings);
 
     resetCronJob();
@@ -618,6 +608,7 @@ app.post("/setNotificationSettings", (req, res) => {
     res.json({ message: "✅ 设置已保存并生效" });
 });
 
+// 服务器启动时初始化任务
 resetCronJob();
 
 app.get("/notificationSettings", isAuthenticated, (req, res) => {
