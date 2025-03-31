@@ -123,7 +123,7 @@
         }
 
         .switch-label span {
-            margin-right: 10px; /* 左侧文字和开关之间的间距 */
+            margin-right: 10px;
         }
 
         .switch-container {
@@ -140,7 +140,7 @@
         .switch {
             width: 50px;
             height: 24px;
-            background-color: #ccc;
+            background-color: #ccc; /* 设置背景为不透明的灰色 */
             border-radius: 50px;
             position: relative;
             transition: background-color 0.3s;
@@ -159,7 +159,7 @@
         }
 
         .switch-container input:checked + .switch {
-            background-color: #4CAF50;
+            background-color: #4CAF50; /* 选中时的绿色背景 */
         }
 
         .switch-container input:checked + .switch:before {
@@ -174,7 +174,7 @@
         
         <!-- 保活端更新开关 -->
         <div class="switch-label">
-            <span>同步更新保活端</span>
+            <span>启用保活端更新</span>
             <label class="switch-container">
                 <input type="checkbox" id="keepAliveSwitch">
                 <span class="switch"></span>
