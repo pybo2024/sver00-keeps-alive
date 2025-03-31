@@ -11,8 +11,8 @@
             padding: 0;
             display: flex;
             justify-content: center;
-            align-items: center;  /* 内容从顶部开始 */
-            min-height: 100vh;  /* 允许页面内容垂直滚动 */
+            align-items: flex-start;
+            min-height: 100vh;
             background: linear-gradient(135deg,  
                 #ff7300,  
                 #ffeb00,  
@@ -21,7 +21,7 @@
             ); 
             background-attachment: fixed;  
             background-size: 100% 100%;
-            overflow: auto;  /* 确保页面可以滚动 */
+            overflow: auto;
         }
 
         .container {
@@ -31,8 +31,8 @@
             background: rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            margin-top: 0px;  /* 让容器有一些顶部间距 */
-            overflow: auto; /* 确保容器内的内容溢出时可以滚动 */
+            margin-top: 20px;
+            overflow: auto;
         }
 
         button {
@@ -49,7 +49,7 @@
             font-size: 15px;
             transition: background-color 0.3s;
             position: relative;
-            width: 120px; /* 固定宽度，防止大小变化 */
+            width: 120px;
         }
 
         button:hover {
@@ -57,7 +57,7 @@
         }
 
         .btn-loading {
-            background-color: #ccc !important;  /* 灰色背景 */
+            background-color: #ccc !important;
             cursor: not-allowed;
         }
 
@@ -65,8 +65,8 @@
             border: 4px solid #f3f3f3;
             border-top: 4px solid #3498db;
             border-radius: 50%;
-            width: 12px; /* 更小的圈圈 */
-            height: 12px; /* 更小的圈圈 */
+            width: 12px;
+            height: 12px;
             animation: spin 2s linear infinite;
             margin-left: 10px;
         }
@@ -81,14 +81,19 @@
             color: #333;
             font-size: 22px;
         }
+        h2 {
+            text-align: center;
+            color: red;
+            font-size: 14px;
+        }
 
         #result {
             margin-top: 20px;
             font-size: 12px;
             word-wrap: break-word;
-            white-space: pre-wrap;  /* 确保长内容自动换行 */
-            max-height: 60vh;  /* 限制输出结果的最大高度 */
-            overflow-y: auto;  /* 允许结果部分垂直滚动 */
+            white-space: pre-wrap;
+            max-height: 60vh;
+            overflow-y: auto;
         }
 
         .result-item {
@@ -112,15 +117,55 @@
 
         .switch-label {
             display: flex;
-            justify-content: space-between;
             align-items: center;
             font-size: 16px;
             margin-bottom: 20px;
         }
 
-        .switch-label input {
-            margin-left: 10px;
+        .switch-label span {
+            margin-right: 10px; /* 左侧文字和开关之间的间距 */
         }
+
+        .switch-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .switch-container input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch {
+            width: 50px;
+            height: 24px;
+            background-color: #ccc;
+            border-radius: 50px;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+
+        .switch:before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: white;
+            transition: transform 0.3s;
+        }
+
+        .switch-container input:checked + .switch {
+            background-color: #4CAF50;
+        }
+
+        .switch-container input:checked + .switch:before {
+            transform: translateX(26px); /* 移动开关圆点 */
+        }
+
     </style>
 </head>
 <body>
@@ -129,8 +174,11 @@
         
         <!-- 保活端更新开关 -->
         <div class="switch-label">
-            <span>同步更新保活端（耐心等待完成）</span>
-            <input type="checkbox" id="keepAliveSwitch">
+            <span>同步更新保活端</span>
+            <label class="switch-container">
+                <input type="checkbox" id="keepAliveSwitch">
+                <span class="switch"></span>
+            </label>
         </div>
 
         <!-- 检查更新按钮 -->
@@ -166,7 +214,7 @@
 
                 if (data.success) {
                     const resultHtml = `
-                        <pre>${data.output}</pre>
+                        <div>${data.output}</div>
                     `;
                     document.getElementById('result').innerHTML = resultHtml;
                 } else {
