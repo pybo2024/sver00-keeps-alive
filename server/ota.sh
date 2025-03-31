@@ -78,9 +78,7 @@ for file in $CHANGED_FILES; do
     fi
 done
 
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🚀 重启web服务"
 devil www restart "$USER_NAME.serv00.net" >/dev/null 2>&1
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🎉 全部更新完成！"
+echo "🎉 更 新 完 成！"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
