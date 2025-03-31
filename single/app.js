@@ -22,7 +22,6 @@ function logMessage(message) {
     if (logs.length > 10) logs.shift();
 }
 
-// 执行 Shell 命令
 function executeCommand(command, actionName, isStartLog = false) {
     return new Promise((resolve, reject) => {
         exec(command, (err, stdout, stderr) => {
@@ -43,7 +42,6 @@ function executeCommand(command, actionName, isStartLog = false) {
     });
 }
 
-// 启动 SingBox
 async function runShellCommand() {
     console.log("start 被调用");
     const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash start.sh`;
@@ -54,7 +52,6 @@ async function runShellCommand() {
     }
 }
 
-// 停止 SingBox
 async function stopShellCommand() {
     console.log("stop 被调用");
     const command = `cd ${process.env.HOME}/serv00-play/singbox/ && bash killsing-box.sh`;
@@ -65,7 +62,6 @@ async function stopShellCommand() {
     }
 }
 
-// 保持 SingBox 存活
 async function KeepAlive() {
     console.log("KeepAlive 被调用");
     const command = `cd ${process.env.HOME}/serv00-play/ && bash keepalive.sh`;
@@ -78,7 +74,6 @@ async function KeepAlive() {
 
 setInterval(KeepAlive, 20000);
 
-// 获取 /info 页面
 app.get("/info", async (req, res) => {
     const htmlContent = `<!DOCTYPE html>
 <html lang="zh">
