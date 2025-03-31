@@ -11,8 +11,8 @@
             padding: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
+            align-items: flex-start;  /* 内容从顶部开始 */
+            min-height: 100vh;  /* 允许页面内容垂直滚动 */
             background: linear-gradient(135deg,  
                 #ff7300,  
                 #ffeb00,  
@@ -21,7 +21,9 @@
             ); 
             background-attachment: fixed;  
             background-size: 100% 100%;
+            overflow: auto;  /* 确保页面可以滚动 */
         }
+
         .container {
             width: 90%;
             max-width: 800px;
@@ -29,6 +31,8 @@
             background: rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;  /* 让容器有一些顶部间距 */
+            overflow: auto; /* 确保容器内的内容溢出时可以滚动 */
         }
 
         button {
@@ -82,6 +86,9 @@
             margin-top: 20px;
             font-size: 12px;
             word-wrap: break-word;
+            white-space: pre-wrap;  /* 确保长内容自动换行 */
+            max-height: 60vh;  /* 限制输出结果的最大高度 */
+            overflow-y: auto;  /* 允许结果部分垂直滚动 */
         }
 
         .result-item {
