@@ -23,6 +23,7 @@ if [ ! -d ".git" ]; then
 fi
 
 # 记录 server 目录下的变动文件，排除 .sh 和 .md 文件
+echo "⬇️ 账号服务更新"
 git fetch origin "$BRANCH" >/dev/null 2>&1
 CHANGED_FILES=$(git diff --name-only origin/"$BRANCH" -- server | grep -Ev '\.sh$|\.md$')
 
