@@ -78,8 +78,6 @@ for file in $CHANGED_FILES; do
 done    
 
 # 更新完成后重启服务
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🚀 重启web服务"
 devil www restart "$USER_NAME.serv00.net" >/dev/null 2>&1
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🎉 更 新 完 成！"
