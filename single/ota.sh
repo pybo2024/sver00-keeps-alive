@@ -65,13 +65,15 @@ for file in $CHANGED_FILES; do
     # 如果是文件删除（在仓库中删除），则删除目标路径的文件
     if ! git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
         if [ -f "$TARGET_FILE" ]; then
+            echo "🗑️ 清理无效文件："
             rm -f "$TARGET_FILE"
-            echo "🗑️ 清理无效文件：$(basename "$TARGET_FILE")"
+            echo "$(basename "$TARGET_FILE")"
         fi
     else
         # 复制文件
+        echo "✅ 已更新："
         cp -f "$SINGLE_PATH/$RELATIVE_PATH" "$TARGET_FILE"
-        echo "✅ 已更新：$(basename "$TARGET_FILE")"
+        echo "$(basename "$TARGET_FILE")"
     fi
 done    
 
