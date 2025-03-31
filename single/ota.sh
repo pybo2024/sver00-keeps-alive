@@ -71,9 +71,9 @@ for file in $CHANGED_FILES; do
         fi
     else
         # 复制文件
-        echo "✅ 已 更 新："
+        echo "🔝 更新内容："
         cp -f "$SINGLE_PATH/$RELATIVE_PATH" "$TARGET_FILE"
-        echo "$(basename "$TARGET_FILE")"
+        echo "✅ $(basename "$TARGET_FILE")"
     fi
 done    
 
