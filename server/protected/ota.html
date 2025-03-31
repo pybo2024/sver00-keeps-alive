@@ -28,7 +28,7 @@
             width: 90%;
             max-width: 800px;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.2); /* 让背景不透明 */
+            background: rgba(255, 255, 255, 0.3);
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             margin-top: 20px;
@@ -89,25 +89,10 @@
             white-space: pre-wrap;
             max-height: 60vh;
             overflow-y: auto;
-        }
-
-        .result-item {
+            background: #f9f9f9;
             padding: 10px;
             border-radius: 5px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .success {
-            background-color: #e7f9e7;
-            color: #4CAF50;
-        }
-
-        .failure {
-            background-color: #ffe6e6;
-            color: #f44336;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
         }
 
         .switch-label {
@@ -124,7 +109,9 @@
         /* 开关样式 */
         .switch-container {
             position: relative;
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: 50px;
             height: 24px;
         }
@@ -138,7 +125,7 @@
         .switch {
             width: 100%;
             height: 100%;
-            background-color: #ccc; /* 默认关闭状态背景 */
+            background-color: #ccc;
             border-radius: 50px;
             position: relative;
             transition: background-color 0.3s;
@@ -160,13 +147,12 @@
             transition: transform 0.3s;
         }
 
-        /* 开关打开状态 */
         .switch-container input:checked + .switch {
-            background-color: #007bff; /* 绿色背景 */
+            background-color: #4CAF50;
         }
 
         .switch-container input:checked + .switch:before {
-            transform: translateX(26px); /* 滑块移动 */
+            transform: translateX(26px);
         }
     </style>
 </head>
@@ -204,9 +190,7 @@
 
             // 禁用按钮并显示加载动画
             updateBtn.classList.add("btn-loading");
-            updateBtn.disabled = true; // 禁用按钮，防止多次点击
-
-            // 将加载动画放在按钮内部
+            updateBtn.disabled = true;
             updateBtn.innerHTML = '';
             updateBtn.appendChild(loader);
 
@@ -228,8 +212,8 @@
             } finally {
                 // 恢复按钮
                 updateBtn.innerHTML = '检查更新';
-                updateBtn.disabled = false; // 恢复按钮
-                updateBtn.classList.remove("btn-loading"); // 恢复按钮样式
+                updateBtn.disabled = false;
+                updateBtn.classList.remove("btn-loading");
             }
         }
     </script>
