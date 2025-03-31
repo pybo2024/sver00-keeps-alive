@@ -615,8 +615,39 @@ app.get("/notificationSettings", isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, "public", "notification_settings.html"));
 });
 
-app.get('/ota/update', isAuthenticated, (req, res) => {
+app.get('/ota/update', isAuthenticated, async (req, res) => {
     console.log("🚀 开始 OTA 更新...");
+
+    const { keepAlive } = req.query;
+    let keepAliveOutput = '';
+
+    if (keepAlive === 'true') {
+        try {
+            const accounts = await getAccounts();
+            const users = Object.keys(accounts);
+
+            console.log(`🔄 检测到 ${users.length} 个账号，开始保活端更新...`);
+
+            for (const user of users) {
+                try {
+                    const keepAliveUrl = `https://${user}.serv00.net/ota/update`;
+                    console.log(`🔄 访问: ${keepAliveUrl}`);
+
+                    const response = await axios.get(keepAliveUrl);
+                    const output = response.data.output || '未返回内容';
+
+                    keepAliveOutput += `账号 ${user}，保活端更新结果: ${output}\n`;
+                    console.log(`✅ 账号 ${user} 保活端更新完成`);
+                } catch (error) {
+                    keepAliveOutput += `账号 ${user}，保活端更新失败: ${error.message}\n`;
+                    console.error(`❌ 账号 ${user} 保活端更新失败: ${error.message}`);
+                }
+            }
+        } catch (error) {
+            console.error(`❌ 获取账号列表失败: ${error.message}`);
+            return res.status(500).json({ success: false, message: `获取账号列表失败: ${error.message}` });
+        }
+    }
 
     const downloadScriptCommand = 'curl -Ls -o /tmp/ota.sh https://raw.githubusercontent.com/ryty1/serv00-save-me/refs/heads/main/server/ota.sh';
 
@@ -637,8 +668,12 @@ app.get('/ota/update', isAuthenticated, (req, res) => {
                 return res.status(500).json({ success: false, message: `执行失败: ${error.message}` });
             }
 
-            console.log("✅ 脚本执行完成");
-            res.json({ success: true, output: stdout || '执行成功' });
+            console.log("✅ OTA 更新完成");
+
+            // 组合最终输出内容，保持原格式，仅在前面追加保活端日志
+            const finalOutput = keepAliveOutput + (stdout || '执行成功');
+
+            res.json({ success: true, output: finalOutput });
         });
     });
 });
