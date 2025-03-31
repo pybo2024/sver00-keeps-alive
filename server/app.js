@@ -633,7 +633,7 @@ app.get('/ota/update', isAuthenticated, async (req, res) => {
                     const keepAliveUrl = `https://${user}.serv00.net/ota/update`;
                     console.log(`🔄 访问: ${keepAliveUrl}`);
 
-                    const response = await axios.get(keepAliveUrl);
+                    const response = await axios.get(keepAliveUrl, { timeout: 20000 });
                     const output = response.data.output || '未返回内容';
 
                     keepAliveOutput += `👤 ${user}，更新结果: \n${output}\n`;
