@@ -636,10 +636,10 @@ app.get('/ota/update', isAuthenticated, async (req, res) => {
                     const response = await axios.get(keepAliveUrl);
                     const output = response.data.output || '未返回内容';
 
-                    keepAliveOutput += `账号 ${user}，更新结果: \n${output}\n`;
+                    keepAliveOutput += `👤 ${user}，更新结果: \n${output}\n`;
                     console.log(`✅ 账号 ${user} 保活端更新完成`);
                 } catch (error) {
-                    keepAliveOutput += `账号 ${user}，保活端更新失败: ${error.message}\n`;
+                    keepAliveOutput += `👤 ${user}，更新失败: \n${error.message}\n`;
                     console.error(`❌ 账号 ${user} 保活端更新失败: ${error.message}`);
                 }
             }
