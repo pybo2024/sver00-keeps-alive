@@ -71,7 +71,7 @@ for file in $CHANGED_FILES; do
         fi
     else
         # 复制文件
-        echo "✅ 已更新："
+        echo "✅ 已 更 新："
         cp -f "$SINGLE_PATH/$RELATIVE_PATH" "$TARGET_FILE"
         echo "$(basename "$TARGET_FILE")"
     fi
@@ -82,5 +82,5 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "🚀 重启web服务"
 devil www restart "$USER_NAME.serv00.net" >/dev/null 2>&1
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🎉 全部更新完成！"
+echo "🎉 更 新 完 成！"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
