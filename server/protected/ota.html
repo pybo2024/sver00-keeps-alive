@@ -11,7 +11,7 @@
             padding: 0;
             display: flex;
             justify-content: center;
-            align-items: flex-start;  /* 内容从顶部开始 */
+            align-items: center;  /* 内容从顶部开始 */
             min-height: 100vh;  /* 允许页面内容垂直滚动 */
             background: linear-gradient(135deg,  
                 #ff7300,  
@@ -129,13 +129,13 @@
         
         <!-- 保活端更新开关 -->
         <div class="switch-label">
-            <span>启用保活端更新</span>
+            <span>同步更新保活端（耐心等待完成）</span>
             <input type="checkbox" id="keepAliveSwitch">
         </div>
 
         <!-- 检查更新按钮 -->
         <button id="updateBtn" onclick="checkForUpdates()">检查更新</button>
-        
+        <h2>更新结果</h2>
         <!-- 结果显示区域 -->
         <div id="result"></div>
     </div>
@@ -166,7 +166,6 @@
 
                 if (data.success) {
                     const resultHtml = `
-                        <h2>更新结果</h2>
                         <pre>${data.output}</pre>
                     `;
                     document.getElementById('result').innerHTML = resultHtml;
