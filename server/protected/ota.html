@@ -178,6 +178,7 @@
         <button id="updateBtn" onclick="checkForUpdates()">检查更新</button>
         
         <!-- 结果显示区域 -->
+        <h2>更新结果</h2>
         <div id="result"></div>
     </div>
 
@@ -202,7 +203,6 @@
 
                 if (data.success) {
                     const resultHtml = `
-                        <h2>更新结果</h2>
                         <div>${data.output}</div>
                     `;
                     document.getElementById('result').innerHTML = resultHtml;
