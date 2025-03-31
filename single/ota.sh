@@ -67,7 +67,7 @@ for file in $CHANGED_FILES; do
         if [ -f "$TARGET_FILE" ]; then
             echo "🗑️ 清理无效文件："
             rm -f "$TARGET_FILE"
-            echo "$(basename "$TARGET_FILE")"
+            echo "☑️ $(basename "$TARGET_FILE")"
         fi
     else
         # 复制文件
