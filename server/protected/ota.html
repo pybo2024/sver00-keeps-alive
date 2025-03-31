@@ -11,7 +11,7 @@
             padding: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             background: linear-gradient(135deg,  
                 #ff7300,  
@@ -28,11 +28,10 @@
             width: 90%;
             max-width: 800px;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             margin-top: 20px;
-            overflow: auto;
         }
 
         button {
@@ -82,6 +81,7 @@
             font-size: 22px;
         }
 
+        /* ✅ 置顶显示日志内容 */
         #result {
             margin-top: 20px;
             font-size: 12px;
@@ -93,6 +93,8 @@
             padding: 10px;
             border-radius: 5px;
             box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column-reverse; /* ✅ 让最新日志显示在顶部 */
         }
 
         .switch-label {
@@ -106,14 +108,14 @@
             margin-right: 10px;
         }
 
-        /* 开关样式 */
+        /* ✅ 加宽开关背景 */
         .switch-container {
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 50px;
-            height: 24px;
+            width: 60px; /* ✅ 变宽 */
+            height: 28px;
         }
 
         .switch-container input {
@@ -137,8 +139,8 @@
 
         .switch:before {
             content: '';
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             background-color: white;
             position: absolute;
@@ -152,7 +154,7 @@
         }
 
         .switch-container input:checked + .switch:before {
-            transform: translateX(26px);
+            transform: translateX(34px); /* ✅ 变大滑动距离 */
         }
     </style>
 </head>
@@ -200,7 +202,7 @@
 
                 if (data.success) {
                     const resultHtml = `
-                        <h2>更新结果</h2>
+                        <div><strong>更新结果:</strong></div>
                         <div>${data.output}</div>
                     `;
                     document.getElementById('result').innerHTML = resultHtml;
