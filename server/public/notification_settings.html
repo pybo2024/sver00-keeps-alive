@@ -36,7 +36,7 @@
         h1 {
             font-size: 24px;
             color: #333;
-            text-align: center;
+            text-align: left;
         }
 
         label {
@@ -46,7 +46,7 @@
             display: block;
         }
 
-        input, select {
+        input {
             width: 100%;
             padding: 10px;
             margin: 10px 0 20px 0;
@@ -57,10 +57,9 @@
             background-color: transparent;
         }
 
-        input:focus, select:focus {
+        input:focus {
             outline: none;
             border-color: #007bff;
-            background-color: transparent;
         }
 
         button {
@@ -125,7 +124,7 @@
             transform: translateX(26px);
         }
 
-        /* 调整 label 和 switch 为同一行 */
+        /* 使 Cron 任务开关和文字在同一行 */
         .cron-row {
             display: inline-flex;
             align-items: center;
@@ -137,7 +136,7 @@
 <body>
     <div class="container">
         <h1>通知 & Telegram 设置</h1>
-        <hr>
+        
         <form id="notificationSettingsForm">
             <div class="cron-row">
                 <label for="cronEnabled">通知开关</label>
@@ -147,8 +146,8 @@
                 </label>
             </div>
 
-            <label for="cronExpression">Cron 表达式:</label>
-            <input type="text" id="cronExpression" placeholder="请输入 如：*/5 * * * *" disabled>
+            <label for="cronExpression">设置时间:</label>
+            <input type="text" id="cronExpression" placeholder="请输入 Cron 表达式，如*/5 * * * *" disabled>
 
             <hr>
 
@@ -163,12 +162,22 @@
     </div>
 
     <script>
+        let savedCronExpression = "";  // 存储上次输入的 Cron 表达式
+
         function updateCronInputState() {
             const cronEnabled = document.getElementById("cronEnabled").checked;
             const cronExpressionInput = document.getElementById("cronExpression");
 
-            // 仅禁用输入框，不清空其值
-            cronExpressionInput.disabled = !cronEnabled;
+            if (cronEnabled) {
+                // 重新启用输入框，并恢复之前的值
+                cronExpressionInput.disabled = false;
+                cronExpressionInput.value = savedCronExpression || "";
+            } else {
+                // 关闭开关时，存储当前值，并显示提示内容
+                savedCronExpression = cronExpressionInput.value;
+                cronExpressionInput.disabled = true;
+                cronExpressionInput.value = "请输入 Cron 表达式，如*/5 * * * *";
+            }
         }
 
         document.getElementById("cronEnabled").addEventListener("change", updateCronInputState);
@@ -179,7 +188,7 @@
                 document.getElementById("telegramToken").value = data.telegramToken || "";
                 document.getElementById("telegramChatId").value = data.telegramChatId || "";
                 document.getElementById("cronEnabled").checked = data.cronEnabled || false;
-                document.getElementById("cronExpression").value = data.cronExpression || ""; // 恢复 Cron 表达式的值
+                savedCronExpression = data.cronExpression || "";
                 updateCronInputState();
             })
             .catch(error => console.error("获取设置失败:", error));
