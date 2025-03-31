@@ -102,18 +102,44 @@
             background-color: #ffe6e6;
             color: #f44336;
         }
+
+        .switch-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .switch-label input {
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>账号端 OTA 更新</h1>
+        
+        <!-- 保活端更新开关 -->
+        <div class="switch-label">
+            <span>启用保活端更新</span>
+            <input type="checkbox" id="keepAliveSwitch">
+        </div>
+
+        <!-- 检查更新按钮 -->
         <button id="updateBtn" onclick="checkForUpdates()">检查更新</button>
+        
+        <!-- 结果显示区域 -->
         <div id="result"></div>
     </div>
 
     <script>
         async function checkForUpdates() {
             const updateBtn = document.getElementById("updateBtn");
+            const keepAliveSwitch = document.getElementById("keepAliveSwitch");
+
+            // 获取保活端更新开关状态
+            const keepAlive = keepAliveSwitch.checked ? 'true' : 'false';
 
             // 创建加载动画
             const loader = document.createElement("span");
@@ -128,7 +154,7 @@
             updateBtn.appendChild(loader);
 
             try {
-                const response = await fetch('/ota/update');
+                const response = await fetch(`/ota/update?keepAlive=${keepAlive}`);
                 const data = await response.json();
 
                 if (data.success) {
