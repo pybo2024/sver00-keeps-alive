@@ -151,7 +151,7 @@ async function sendErrorToTG(user, status, message) {
         }
 
         const formattedMessage = `
-㊙️ *${titleBar}*
+*📥 ${titleBar}*
 ——————————————————
 👤 账号: \`${user}\`
 🖥️ 主机: \`${seasons}.serv00.com\`
