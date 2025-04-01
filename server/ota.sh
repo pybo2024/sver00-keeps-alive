@@ -57,6 +57,7 @@ git reset --hard origin/"$BRANCH" >/dev/null 2>&1
 
 # 遍历变更的文件并复制到目标路径
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "🔄 更新内容："
 for file in $CHANGED_FILES; do
     RELATIVE_PATH=${file#server/}  # 去掉 "server/" 前缀
     TARGET_FILE="$TARGET_PATH/$RELATIVE_PATH"  # 保持相对路径一致
@@ -66,13 +67,11 @@ for file in $CHANGED_FILES; do
     # 如果是文件删除（在仓库中删除），则删除目标路径的文件
     if ! git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
         if [ -f "$TARGET_FILE" ]; then
-            echo "🗑️ 清理无效文件："
             rm -f "$TARGET_FILE"
-            echo "☑️ $(basename "$TARGET_FILE")"
+            echo "🗑️ 清理无效文件：$(basename "$TARGET_FILE")"
         fi
     else
         # 复制文件
-        echo "🔝 更新内容："
         cp -f "$SERVER_PATH/$RELATIVE_PATH" "$TARGET_FILE"
         echo "✅ $(basename "$TARGET_FILE")"
     fi
