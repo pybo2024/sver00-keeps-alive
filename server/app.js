@@ -129,7 +129,7 @@ async function sendErrorToTG(user, status, message) {
 
         let statusMessage, buttonText, buttonUrl;
         if (status === 403) {
-            titleBar = "📥 Serv00 前线死亡证书";
+            titleBar = "📥 Serv00 前线阵亡清单";
             statusMessage = "账号已封禁";
             buttonText = "重新申请账号";
             buttonUrl = "https://www.serv00.com/offer/create_new_account";
