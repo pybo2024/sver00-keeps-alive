@@ -67,7 +67,7 @@ for file in $CHANGED_FILES; do
     if ! git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
         if [ -f "$TARGET_FILE" ]; then
             rm -f "$TARGET_FILE"
-            echo "🗑️ 清理无效文件： $(basename "$TARGET_FILE")"
+            echo "🗑️ 清理无效文件：$(basename "$TARGET_FILE")"
         fi
     else
         # 复制文件
