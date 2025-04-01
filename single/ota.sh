@@ -56,7 +56,7 @@ git reset --hard origin/"$BRANCH" >/dev/null 2>&1
 
 # 遍历变更的文件并复制到目标路径
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🔝 更新内容："
+echo "🔄 更新内容："
 for file in $CHANGED_FILES; do
     RELATIVE_PATH=${file#single/}  # 去掉 "single/" 前缀
     TARGET_FILE="$TARGET_PATH/$RELATIVE_PATH"  # 保持相对路径一致
