@@ -108,8 +108,8 @@ async function sendErrorToTG(user, status, message) {
         const cacheKey = `${user}:${status}`; 
         const lastSentTime = errorCache.get(cacheKey);
 
-        if (lastSentTime && now - lastSentTime < 30 * 60 * 1000) {
-            console.log(`⏳ 30分钟内已发送过 ${user} 的状态 ${status}，跳过通知`);
+        if (lastSentTime && now - lastSentTime < 3 * 60 * 60 * 1000) {
+            console.log(`⏳ 3小时内已发送过 ${user} 的状态 ${status}，跳过通知`);
             return;
         }
 
