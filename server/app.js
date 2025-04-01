@@ -129,25 +129,29 @@ async function sendErrorToTG(user, status, message) {
 
         let statusMessage, buttonText, buttonUrl;
         if (status === 403) {
+            titleBar = "Serv00 死亡证书";
             statusMessage = "账号已封禁";
             buttonText = "重新申请账号";
             buttonUrl = "https://www.serv00.com/offer/create_new_account";
         } else if (status === 404) {
+            titleBar = "HtmlOnLive 提醒";
             statusMessage = "保活未安装";
             buttonText = "前往安装保活";
             buttonUrl = "https://github.com/ryty1/serv00-save-me";
         } else if (status >= 500 && status <= 599) {
+            titleBar = "HtmlOnLive 失败通知";
             statusMessage = "服务器错误";
             buttonText = "查看服务器状态";
             buttonUrl = "https://ssss.nyc.mn/";
         } else {
+            titleBar = "HtmlOnLive 失败通知";
             statusMessage = `访问异常`;
             buttonText = "手动进入保活";
             buttonUrl = "https://${user}.serv00.net/info";
         }
 
         const formattedMessage = `
-㊙️ *失败通知*
+㊙️ *${titleBar}*
 ——————————————————
 👤 账号: \`${user}\`
 🖥️ 主机: \`${seasons}.serv00.com\`
