@@ -45,9 +45,9 @@
 
   ##  ● 截图预览（部分功能展示）：
   
-![Image Description](https://raw.githubusercontent.com/ryty1/alist-log/refs/heads/main/github_images/2.jpg?raw=true) 
+![Image Description](https://raw.githubusercontent.com/ryty1/alist-log/refs/heads/main/github_images/7.png?raw=true) 
 
-![Image Description](https://raw.githubusercontent.com/ryty1/alist-log/refs/heads/main/github_images/5.jpg?raw=true) 
+![Image Description](https://raw.githubusercontent.com/ryty1/alist-log/refs/heads/main/github_images/8.png?raw=true) 
 
   ## ● 自己可以杀掉进程再刷新网页，然后在SSH端 ps aux 查询进程
 
