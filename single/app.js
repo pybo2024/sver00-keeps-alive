@@ -72,7 +72,7 @@ async function KeepAlive() {
     }
 }
 
-setInterval(KeepAlive, 20000);
+setInterval(KeepAlive, 1800000);
 
 app.get("/info", async (req, res) => {
     const htmlContent = `<!DOCTYPE html>
