@@ -6,7 +6,7 @@
   ##  ● 适配：
 适配 [饭奇骏](https://github.com/frankiejun/serv00-play) 大佬的 serv00-play 脚本。有问题联系本人 [机器人](https://t.me/SerokBot_bot) 。
 
-【重点】：饭佬脚本中需要设置 6 选项，开启cron设 y 。
+【重点】：饭佬脚本中需要设置 6 选项，开启cron设 y ，建议59分钟。
 
 【提醒】：[账号服务] 与 [本机保活] 无法共存(本人实力有限)，意味着如果需要 多账号服务 就需要单独占用一个账号。
         
@@ -19,7 +19,7 @@
 
   ##  ● 功能（账号服务与本机保活无法共存）：
 
-  [账号服务定时访问设置](https://github.com/ryty1/web-visit) 由于波兰仔策略调整建议设置 5-10 分钟一次，时间间隔过长 保活进程 与 官方删cron 会错过导致进程无法拉起，这种需要手动访问账号的保活网页。
+  [账号服务定时访问设置](https://github.com/ryty1/web-visit) 由于波兰仔策略调整建议设置 2 小时一次，长时间进程无法拉起，这种需要手动访问账号的保活 或 账号服务 登录（不用登录）网页。
   
   经测试cf worker项目设置5分钟一次基本可以正常！
 
@@ -45,11 +45,11 @@
 
   ##  ● 截图预览（部分功能展示）：
   
-![Image Description](https://raw.githubusercontent.com/ryty1/alist-log/refs/heads/main/github_images/6.png?raw=true) 
+![Image Description](https://raw.githubusercontent.com/ryty1/alist-log/refs/heads/main/github_images/2.jpg?raw=true) 
 
-![Image Description](https://raw.githubusercontent.com/ryty1/alist-log/refs/heads/main/github_images/4.jpg?raw=true) 
+![Image Description](https://raw.githubusercontent.com/ryty1/alist-log/refs/heads/main/github_images/5.jpg?raw=true) 
 
-  ## ● 自己可以杀掉进程再刷新网页，然后再SSH端 ps aux 查询进程
+  ## ● 自己可以杀掉进程再刷新网页，然后在SSH端 ps aux 查询进程
 
   ## ● 大厂优选域名
 
