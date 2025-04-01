@@ -133,6 +133,11 @@ async function sendErrorToTG(user, status, message) {
             statusMessage = "账号已封禁";
             buttonText = "重新申请账号";
             buttonUrl = "https://www.serv00.com/offer/create_new_account";
+        } else if (status === 301) {
+            titleBar = "🔴 HtmlOnLive 失败通知";
+            statusMessage = "账号未注册";
+            buttonText = "前往申请账号";
+            buttonUrl = "https://www.serv00.com/offer/create_new_account";
         } else if (status === 404) {
             titleBar = "🟠 HtmlOnLive 提醒";
             statusMessage = "保活未安装";
