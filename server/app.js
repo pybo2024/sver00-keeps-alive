@@ -113,7 +113,7 @@ async function sendErrorToTG(user, status, message) {
             return;
         }
 
-        if (status !== 404 && lastSentTime && now - lastSentTime < 3 * 60 * 60 * 1000) {
+        if (status !== 404 && lastSentTime && now - lastSentTime < 2 * 60 * 1000) {
             console.log(`⏳ 3小时内已发送过 ${user} 的状态 ${status}，跳过通知`);
             return;
         }
