@@ -650,9 +650,9 @@ app.post("/clear-log", isAuthenticated, (req, res) => {
 
     fs.writeFile(errorLogFilePath, '', (err) => {
         if (err) {
-            return res.status(500).send('Error clearing log file.');
+            return res.status(500).send('日志清理失败');
         }
-        res.send('Log cleared successfully');
+        res.send('日志清理完成');
     });
 });
 
