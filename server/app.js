@@ -624,6 +624,23 @@ app.get("/notificationSettings", isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, "public", "notification_settings.html"));
 });
 
+const errorLogFilePath = path.join(process.env.HOME, "domains", `${username}.serv00.net`, "logs", "error.log");
+
+app.get("/catlog-data", isAuthenticated, (req, res) => {
+    const errorLogFilePath = path.join(process.env.HOME, "domains", `${username}.serv00.net`, "logs", "error.log");
+
+    fs.readFile(errorLogFilePath, 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).send('Error reading log file.');
+        }
+        res.send(data);
+    });
+});
+
+app.get("/catlog", isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, "protected", "logs.html"));
+});
+
 app.get('/ota/update', isAuthenticated, async (req, res) => {
     console.log("🚀 开始 OTA 更新...");
 
