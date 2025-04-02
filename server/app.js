@@ -412,15 +412,14 @@ async function getNodesSummary(socket) {
 
     for (let user of users) {
         const nodeUrl = `https://${user}.serv00.net/node`;
+
+        const logMessage = `采集 ${user} 节点数据！`;
+        if (!loggedMessages.has(logMessage)) {
+            console.log(logMessage);
+            loggedMessages.add(logMessage);
+        }
+
         try {
-            const logMessage = `采集 ${user} 节点数据！`;
-
-            // 只有未输出过的日志才打印
-            if (!loggedMessages.has(logMessage)) {
-                console.log(logMessage);
-                loggedMessages.add(logMessage);
-            }
-
             const nodeResponse = await axios.get(nodeUrl, { timeout: 5000 });
             const nodeData = nodeResponse.data;
 
@@ -438,10 +437,10 @@ async function getNodesSummary(socket) {
             });
 
             if (nodeLinks.length === 0) {
-                const failedMessage = `账号 ${user} 连接成功但无有效节点`;
-                if (!loggedMessages.has(failedMessage)) {
-                    console.log(failedMessage);
-                    loggedMessages.add(failedMessage);
+                const noNodesMessage = `账号 ${user} 连接成功但无有效节点`;
+                if (!loggedMessages.has(noNodesMessage)) {
+                    console.log(noNodesMessage);
+                    loggedMessages.add(noNodesMessage);
                 }
                 failedAccounts.push(user);
             }
@@ -454,6 +453,32 @@ async function getNodesSummary(socket) {
             failedAccounts.push(user);
         }
     }
+
+    // 整理成 Base64 订阅格式
+    const allNodes = [...successfulNodes.hysteria2, ...successfulNodes.vmess].join("\n");
+    const base64Sub = Buffer.from(allNodes).toString("base64");
+
+    // 生成 `sub.json`
+    const subData = { sub: base64Sub };
+    fs.writeFileSync(SUB_FILE_PATH, JSON.stringify(subData, null, 4));
+
+    const subUpdatedMessage = "订阅文件 sub.json 已更新！";
+    if (!loggedMessages.has(subUpdatedMessage)) {
+        console.log(subUpdatedMessage);
+        loggedMessages.add(subUpdatedMessage);
+    }
+
+    socket.emit("nodesSummary", { successfulNodes, failedAccounts });
+}
+
+io.on("connection", (socket) => {
+    console.log("客户端已连接");
+
+    socket.on("startNodesSummary", async () => {
+        await getNodesSummary(socket);
+    });
+});
+
 
     // 整理成 Base64 订阅格式
     const allNodes = [...successfulNodes.hysteria2, ...successfulNodes.vmess].join("\n");
