@@ -396,6 +396,8 @@ function filterNodes(nodes) {
     return nodes.filter(node => node.startsWith("vmess://") || node.startsWith("hysteria2://"));
 }
 
+let isFetching = false; // 全局变量，防止重复触发
+
 async function getNodesSummary(socket) {
     const accounts = await getAccounts(true);
     if (!accounts || Object.keys(accounts).length === 0) {
@@ -453,17 +455,22 @@ async function getNodesSummary(socket) {
     socket.emit("nodesSummary", { successfulNodes, failedAccounts });
 }
 
-// 防止重复触发
-let isFetching = false;
-
+// 防止客户端多次触发采集任务
 io.on("connection", (socket) => {
     console.log("客户端已连接");
 
     socket.on("startNodesSummary", async () => {
-        if (isFetching) return; // 防止重复触发
-        isFetching = true;
-        await getNodesSummary(socket);
-        isFetching = false;
+        if (isFetching) {
+            console.log("节点数据采集已在进行中...");
+            return; // 防止重复触发
+        }
+
+        isFetching = true; // 标记为正在采集数据
+        console.log("开始节点数据采集任务...");
+
+        await getNodesSummary(socket); // 执行采集
+
+        isFetching = false; // 完成后重置标志
     });
 });
 
