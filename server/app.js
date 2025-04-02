@@ -624,10 +624,8 @@ app.get("/notificationSettings", isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, "public", "notification_settings.html"));
 });
 
-const errorLogFilePath = path.join(process.env.HOME, "domains", `${username}.serv00.net`, "logs", "error.log");
-
 app.get("/catlog-data", isAuthenticated, (req, res) => {
-    const errorLogFilePath = path.join(process.env.HOME, "domains", `${username}.serv00.net`, "logs", "error.log");
+    const errorLogFilePath = path.join(process.env.HOME, "domains", `${MAIN_SERVER_USER}.serv00.net`, "logs", "error.log");
 
     fs.readFile(errorLogFilePath, 'utf8', (err, data) => {
         if (err) {
