@@ -162,6 +162,8 @@
     <script>
         const socket = io();
         let nodesText = "";
+        let isRequesting = false;  // 标志防止多次请求
+
         const startBtn = document.getElementById("startBtn");
         const startContent = document.getElementById("startContent");
         const subLinkInput = document.getElementById("subLink");
@@ -171,11 +173,14 @@
         subLinkInput.value = `https://${location.hostname}/sub`;
 
         function startNodesSummary() {
+            if (isRequesting) return;  // 如果请求已在进行中，直接返回
+            isRequesting = true;  // 标记请求开始
+
             startBtn.classList.add("btn-disabled");
             startBtn.disabled = true;
-            startContent.innerText = "采集中..."; // 更改按钮文字
+            startContent.innerText = "采集中...";
 
-            socket.emit("startNodesSummary"); // 向服务器请求节点采集
+            socket.emit("startNodesSummary");
         }
 
         function copyNodes() {
@@ -195,7 +200,7 @@
         }
 
         socket.on("nodesSummary", (data) => {
-            console.log("完整返回数据:", data);
+            isRequesting = false;  // 请求结束，重置标志
 
             const failedAccountsDiv = document.getElementById("failedAccounts");
 
@@ -204,7 +209,7 @@
             if (allNodes.length > 0) {
                 nodesText = allNodes.join("\n");
                 allNodesDiv.innerText = nodesText;
-                allNodesDiv.style.color = "black"; 
+                allNodesDiv.style.color = "black";
             } else {
                 allNodesDiv.innerText = "没有成功的资源。";
                 nodesText = "";
@@ -213,14 +218,8 @@
             defaultTextDiv.style.display = "none";
 
             if (data.failedAccounts && data.failedAccounts.length > 0) {
-                failedAccountsDiv.innerHTML = `<b>以下账号获取失败：</b><br>${data.failedAccounts.join("<br>")}`;
-            } else {
-                failedAccountsDiv.innerHTML = "暂无失败账号";
+                failedAccountsDiv.innerText = `失败账号：${data.failedAccounts.join(", ")}`;
             }
-
-            startContent.innerText = "节点采集"; 
-            startBtn.classList.remove("btn-disabled");
-            startBtn.disabled = false;
         });
     </script>
 </body>
