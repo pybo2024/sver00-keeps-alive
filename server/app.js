@@ -252,7 +252,7 @@ app.get("/logout", (req, res) => {
                 if (file.endsWith(".json")) {
                     if (fs.existsSync(filePath)) {
                         fs.unlinkSync(filePath);  
-                        console.log("已删除 session 文件");
+                        console.log("已删除 session 登录密钥文件");
                     }
                 }
             });
