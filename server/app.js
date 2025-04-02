@@ -48,7 +48,7 @@ app.use(session({
     store: new FileStore({
         path: path.join(__dirname, "sessions"), 
         ttl: 60 * 60,  
-        retries: 1,
+        retries: 0,
         clearInterval: 3600 
     }),
     secret: getSessionSecret(), 
