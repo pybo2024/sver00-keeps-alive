@@ -402,7 +402,7 @@ let isProcessing = false;  // 设置标志，防止重复请求
 async function getNodesSummary(socket) {
     // 防止重复请求
     if (isProcessing) {
-        console.log("请求已在处理中，忽略重复请求");
+        // console.log("请求已在处理中，忽略重复请求");
         return;
     }
 
