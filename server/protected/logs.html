@@ -7,41 +7,110 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg,  
+                #ff7300,  
+                #ffeb00,  
+                #47e500,  
+                #00e5c0  
+            ); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            box-sizing: border-box;
         }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+        }
+
         #logContainer {
             white-space: pre-wrap; /* 保持换行 */
             background-color: #282c34;
             color: #f5f5f5;
             padding: 20px;
             border-radius: 8px;
-            overflow: auto;
+            overflow-y: auto;
             height: 400px;
             margin-top: 20px;
+            font-family: monospace;
+            word-wrap: break-word;
         }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
         button {
-            padding: 10px;
+            padding: 12px 20px;
             font-size: 16px;
             background-color: #007bff;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            flex: 1;
         }
+
         button:hover {
             background-color: #0056b3;
+        }
+
+        #loading {
+            display: none;
+            color: #007bff;
+            font-size: 16px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .button-container {
+                flex-direction: column;
+            }
+
+            button {
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <h1>Log Viewer</h1>
-    <button id="loadLogButton">Load Log</button>
+    <div class="container">
+        <h1>Log Viewer</h1>
+        <div class="button-container">
+            <button id="loadLogButton">Load Log</button>
+            <button id="clearLogButton">Clear Log</button>
+        </div>
 
-    <div id="logContainer">Logs will appear here...</div>
+        <div id="logContainer">Logs will appear here...</div>
+
+        <div id="loading">Loading logs...</div>
+    </div>
 
     <script>
         document.getElementById('loadLogButton').addEventListener('click', function() {
-            // 发送 GET 请求到 /catlog 端点获取日志内容
+
+            document.getElementById('loading').style.display = 'block';
+            
             fetch('/catlog-data')
                 .then(response => {
                     if (response.ok) {
@@ -51,11 +120,27 @@
                     }
                 })
                 .then(data => {
-                    // 将返回的日志数据显示到 #logContainer 中
                     document.getElementById('logContainer').textContent = data;
                 })
                 .catch(error => {
                     document.getElementById('logContainer').textContent = 'Error loading log: ' + error.message;
+                })
+                .finally(() => {
+                    document.getElementById('loading').style.display = 'none';
+                });
+        });
+
+        document.getElementById('clearLogButton').addEventListener('click', function() {
+            fetch('/clear-log', { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        document.getElementById('logContainer').textContent = 'Logs cleared.';
+                    } else {
+                        throw new Error('Failed to clear log');
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('logContainer').textContent = 'Error clearing log: ' + error.message;
                 });
         });
     </script>
