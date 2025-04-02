@@ -392,15 +392,27 @@ io.on("connection", (socket) => {
 
 const SUB_FILE_PATH = path.join(__dirname, "sub.json");
 
+// 过滤有效的节点（vmess 和 hysteria2）
 function filterNodes(nodes) {
     return nodes.filter(node => node.startsWith("vmess://") || node.startsWith("hysteria2://"));
 }
 
+let isProcessing = false;  // 设置标志，防止重复请求
+
 async function getNodesSummary(socket) {
+    // 防止重复请求
+    if (isProcessing) {
+        console.log("请求已在处理中，忽略重复请求");
+        return;
+    }
+
+    isProcessing = true;  // 设置为正在处理
+
     const accounts = await getAccounts(true);
     if (!accounts || Object.keys(accounts).length === 0) {
         console.log("⚠️ 未找到账号数据！");
         socket.emit("nodesSummary", { successfulNodes: { hysteria2: [], vmess: [] }, failedAccounts: [] });
+        isProcessing = false;  // 请求结束，重置标志
         return;
     }
 
@@ -408,21 +420,14 @@ async function getNodesSummary(socket) {
     let successfulNodes = { hysteria2: [], vmess: [] };
     let failedAccounts = [];
 
-    const loggedMessages = new Set(); // 用于去重日志信息
-
     for (let user of users) {
         const nodeUrl = `https://${user}.serv00.net/node`;
-
-        const logMessage = `采集 ${user} 节点数据！`;
-        if (!loggedMessages.has(logMessage)) {
-            console.log(logMessage);
-            loggedMessages.add(logMessage);
-        }
-
         try {
+            // console.log(`开始请求节点数据: ${nodeUrl}`);
             const nodeResponse = await axios.get(nodeUrl, { timeout: 5000 });
-            const nodeData = nodeResponse.data;
+            console.log(`✅ 账号 ${user} 采集完成！`);
 
+            const nodeData = nodeResponse.data;
             const nodeLinks = filterNodes([
                 ...(nodeData.match(/vmess:\/\/[^\s<>"]+/g) || []),
                 ...(nodeData.match(/hysteria2:\/\/[^\s<>"]+/g) || [])
@@ -437,19 +442,11 @@ async function getNodesSummary(socket) {
             });
 
             if (nodeLinks.length === 0) {
-                const noNodesMessage = `账号 ${user} 连接成功但无有效节点`;
-                if (!loggedMessages.has(noNodesMessage)) {
-                    console.log(noNodesMessage);
-                    loggedMessages.add(noNodesMessage);
-                }
+                console.log(`⚠️ 账号 ${user} 连接成功但无有效节点`);
                 failedAccounts.push(user);
             }
         } catch (error) {
-            const errorMessage = `账号 ${user} 获取节点失败: ${error.message}`;
-            if (!loggedMessages.has(errorMessage)) {
-                console.log(errorMessage);
-                loggedMessages.add(errorMessage);
-            }
+            console.log(`❌ 账号 ${user} 采集失败: ${error.message}`);
             failedAccounts.push(user);
         }
     }
@@ -462,13 +459,11 @@ async function getNodesSummary(socket) {
     const subData = { sub: base64Sub };
     fs.writeFileSync(SUB_FILE_PATH, JSON.stringify(subData, null, 4));
 
-    const subUpdatedMessage = "订阅文件 sub.json 已更新！";
-    if (!loggedMessages.has(subUpdatedMessage)) {
-        console.log(subUpdatedMessage);
-        loggedMessages.add(subUpdatedMessage);
-    }
+    console.log("订阅文件 sub.json 已更新！");
 
     socket.emit("nodesSummary", { successfulNodes, failedAccounts });
+
+    isProcessing = false;  // 处理完毕
 }
 
 io.on("connection", (socket) => {
@@ -479,6 +474,19 @@ io.on("connection", (socket) => {
     });
 });
 
+app.get('/sub', (req, res) => {
+    try {
+        const subData = JSON.parse(fs.readFileSync('sub.json', 'utf8')); // 解析 JSON
+        if (subData.sub) {
+            res.setHeader('Content-Type', 'text/plain'); // 纯文本
+            res.send(subData.sub); // 只返回 Base64 订阅内容
+        } else {
+            res.status(500).send('订阅内容为空');
+        }
+    } catch (err) {
+        res.status(500).send('订阅文件读取失败');
+    }
+});
 
 let cronJob = null;
 
