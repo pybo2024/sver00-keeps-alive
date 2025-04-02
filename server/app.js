@@ -249,16 +249,21 @@ app.get("/logout", (req, res) => {
         if (fs.existsSync(SESSION_DIR)) {
             fs.readdirSync(SESSION_DIR).forEach(file => {
                 const filePath = path.join(SESSION_DIR, file);
-                if (file.endsWith(".json")) { 
-                    fs.unlinkSync(filePath);
-                    console.log("已删除 session 文件");
+                if (file.endsWith(".json")) {
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath);  
+                        console.log("已删除 session 文件");
+                    }
                 }
             });
         }
     } catch (error) {
+        console.error("删除 session 文件失败:", error);
     }
 
-    res.redirect("/login"); 
+    req.session.destroy(() => {
+        res.redirect("/login");
+    });
 });
 
 
