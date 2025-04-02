@@ -104,21 +104,28 @@ async function sendErrorToTG(user, status, message) {
         }
 
         const now = Date.now();
-        const cacheKey = `${user}:${status}`; 
+        const cacheKey = `${user}:${status}`;
         const lastSentTime = errorCache.get(cacheKey);
 
-        if (lastSentTime && now - lastSentTime < 3 * 60 * 60 * 1000) {
+        // 只发送一次 404 错误
+        if (status === 404 && lastSentTime) {
+            console.log(`⏳ 404 状态已发送过 ${user}，跳过通知`);
+            return;
+        }
+
+        // 其他错误 3 小时内不重复发送
+        if (status !== 404 && lastSentTime && now - lastSentTime < 3 * 60 * 60 * 1000) {
             console.log(`⏳ 3小时内已发送过 ${user} 的状态 ${status}，跳过通知`);
             return;
         }
 
-        errorCache.set(cacheKey, now); 
+        // 记录发送时间
+        errorCache.set(cacheKey, now);
 
         const bot = new TelegramBot(settings.telegramToken, { polling: false });
         const nowStr = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
-        
-        let seasons; 
 
+        let seasons;
         try {
             const accountsData = JSON.parse(fs.readFileSync(ACCOUNTS_FILE, "utf8"));
             seasons = accountsData[user]?.season?.toLowerCase();
@@ -126,7 +133,7 @@ async function sendErrorToTG(user, status, message) {
             console.error("⚠️ 读取 accounts.json 失败:", err);
         }
 
-        let statusMessage, buttonText, buttonUrl;
+        let titleBar, statusMessage, buttonText, buttonUrl;
         if (status === 403) {
             titleBar = "📥 Serv00 阵亡通知书";
             statusMessage = "账号已封禁";
@@ -146,7 +153,7 @@ async function sendErrorToTG(user, status, message) {
             titleBar = "🔴 HtmlOnLive 失败通知";
             statusMessage = `访问异常`;
             buttonText = "手动进入保活";
-            buttonUrl = "https://${user}.serv00.net/info";
+            buttonUrl = `https://${user}.serv00.net/info`;
         }
 
         const formattedMessage = `
