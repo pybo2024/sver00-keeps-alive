@@ -108,29 +108,26 @@ async function sendErrorToTG(user, status, message) {
         const cacheKey = `${user}:${status}`;
         const lastSentTime = errorCache.get(cacheKey);
 
-        if (status === 404 && lastSentTime) {
-            console.log(`⏳ 404 状态已发送过 ${user}，跳过通知`);
-            return;
+        if (status === 404) {
+            // **如果404状态已经发送过，则直接跳过**
+            if (lastSentTime) {
+                console.log(`⏳ 404 状态已发送过 ${user}，跳过通知`);
+                return;
+            }
+            // **记录404状态发送时间**
+            errorCache.set(cacheKey, now);
+        } else {
+            // **非404状态：如果在3小时内发送过，则跳过**
+            if (lastSentTime && now - lastSentTime < 3 * 60 * 60 * 1000) {
+                console.log(`⏳ 3小时内已发送过 ${user} 的状态 ${status}，跳过通知`);
+                return;
+            }
+            // **记录最新的非404状态发送时间**
+            errorCache.set(cacheKey, now);
         }
-
-        if (status !== 404 && lastSentTime && now - lastSentTime < 3 * 60 * 60 * 1000) {
-            console.log(`⏳ 3小时内已发送过 ${user} 的状态 ${status}，跳过通知`);
-            return;
-        }
-
-        // 记录发送时间
-        errorCache.set(cacheKey, now);
 
         const bot = new TelegramBot(settings.telegramToken, { polling: false });
         const nowStr = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
-
-        let seasons;
-        try {
-            const accountsData = JSON.parse(fs.readFileSync(ACCOUNTS_FILE, "utf8"));
-            seasons = accountsData[user]?.season?.toLowerCase();
-        } catch (err) {
-            console.error("⚠️ 读取 accounts.json 失败:", err);
-        }
 
         let titleBar, statusMessage, buttonText, buttonUrl;
         if (status === 403) {
@@ -159,7 +156,6 @@ async function sendErrorToTG(user, status, message) {
 *${titleBar}*
 ——————————————————
 👤 账号: \`${user}\`
-🖥️ 主机: \`${seasons}.serv00.com\`
 📶 状态: *${statusMessage}*
 📝 详情: *${status}*•\`${message}\`
 ——————————————————
@@ -168,15 +164,13 @@ async function sendErrorToTG(user, status, message) {
         const options = {
             parse_mode: "Markdown",
             reply_markup: {
-                inline_keyboard: [[
-                    { text: buttonText, url: buttonUrl }
-                ]]
+                inline_keyboard: [[{ text: buttonText, url: buttonUrl }]]
             }
         };
 
         await bot.sendMessage(settings.telegramChatId, formattedMessage, options);
-
         console.log(`✅ 已发送 Telegram 通知: ${user} - ${status}`);
+
     } catch (err) {
         console.error("❌ 发送 Telegram 通知失败:", err);
     }
