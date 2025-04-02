@@ -83,11 +83,15 @@
         /* Responsive design */
         @media (max-width: 600px) {
             .button-container {
-                flex-direction: column;
+                display: flex;
+                justify-content: space-between; /* Keep buttons on the same row */
+                gap: 10px;
             }
 
             button {
-                margin-bottom: 10px;
+                flex: 0.45; /* Make the buttons slightly smaller */
+                font-size: 14px; /* Smaller font for buttons */
+                padding: 10px; /* Smaller padding */
             }
         }
     </style>
@@ -100,8 +104,9 @@
             <button id="loadLogButton">读取日志</button>
             <button id="clearLogButton">清理日志</button>
         </div>
-        <div id="loading">正在加载中...</div>
+        <div id="loading">加载中...</div>
         <div id="logContainer">Logs will appear here...</div>
+
     </div>
 
     <script>
@@ -118,27 +123,30 @@
                     }
                 })
                 .then(data => {
+
                     document.getElementById('logContainer').textContent = data;
                 })
                 .catch(error => {
-                    document.getElementById('logContainer').textContent = '日志读取失败: ' + error.message;
+                    document.getElementById('logContainer').textContent = '日志加载失败: ' + error.message;
                 })
                 .finally(() => {
+
                     document.getElementById('loading').style.display = 'none';
                 });
         });
 
         document.getElementById('clearLogButton').addEventListener('click', function() {
+
             fetch('/clear-log', { method: 'POST' })
                 .then(response => {
                     if (response.ok) {
-                        document.getElementById('logContainer').textContent = '清理成功';
+                        document.getElementById('logContainer').textContent = '日志清理成功.';
                     } else {
                         throw new Error('Failed to clear log');
                     }
                 })
                 .catch(error => {
-                    document.getElementById('logContainer').textContent = '清理失败: ' + error.message;
+                    document.getElementById('logContainer').textContent = '日志清理失败: ' + error.message;
                 });
         });
     </script>
