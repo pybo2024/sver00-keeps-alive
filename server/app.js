@@ -404,9 +404,11 @@ async function getNodesSummary(socket) {
         return;
     }
 
-    const users = Object.keys(accounts); 
+    const users = [...new Set(Object.keys(accounts))]; // 去重账号列表
     let successfulNodes = { hysteria2: [], vmess: [] };
     let failedAccounts = [];
+
+    console.log("开始采集节点数据...");
 
     for (let user of users) {
         const nodeUrl = `https://${user}.serv00.net/node`;
@@ -421,9 +423,9 @@ async function getNodesSummary(socket) {
             ]);
 
             nodeLinks.forEach(link => {
-                if (link.startsWith("hysteria2://")) {
+                if (link.startsWith("hysteria2://") && !successfulNodes.hysteria2.includes(link)) {
                     successfulNodes.hysteria2.push(link);
-                } else if (link.startsWith("vmess://")) {
+                } else if (link.startsWith("vmess://") && !successfulNodes.vmess.includes(link)) {
                     successfulNodes.vmess.push(link);
                 }
             });
@@ -451,26 +453,18 @@ async function getNodesSummary(socket) {
     socket.emit("nodesSummary", { successfulNodes, failedAccounts });
 }
 
+// 防止重复触发
+let isFetching = false;
+
 io.on("connection", (socket) => {
     console.log("客户端已连接");
 
     socket.on("startNodesSummary", async () => {
+        if (isFetching) return; // 防止重复触发
+        isFetching = true;
         await getNodesSummary(socket);
+        isFetching = false;
     });
-});
-
-app.get('/sub', (req, res) => {
-    try {
-        const subData = JSON.parse(fs.readFileSync('sub.json', 'utf8')); // 解析 JSON
-        if (subData.sub) {
-            res.setHeader('Content-Type', 'text/plain'); // 纯文本
-            res.send(subData.sub); // 只返回 Base64 订阅内容
-        } else {
-            res.status(500).send('订阅内容为空');
-        }
-    } catch (err) {
-        res.status(500).send('订阅文件读取失败');
-    }
 });
 
 let cronJob = null;
