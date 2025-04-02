@@ -251,7 +251,7 @@ app.get("/logout", (req, res) => {
                 const filePath = path.join(SESSION_DIR, file);
                 if (file.endsWith(".json")) { // 只删除 JSON 文件
                     fs.unlinkSync(filePath);
-                    console.log("已删除 session 文件:", filePath);
+                    console.log("已删除 session 文件:");
                 }
             });
         }
