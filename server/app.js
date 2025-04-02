@@ -258,10 +258,8 @@ app.get("/online", async (req, res) => {
             })
             .then(response => {
                 if (response.status === 200 && response.data) {
-                    console.log(`✅ ${user} 保活成功，状态码: ${response.status}`);
-                    console.log(`📄 ${user} 响应大小: ${response.data.length} 字节`);
-
-                    // 模拟浏览器保持页面 3 秒
+                    console.log(`✅ ${user} 保活成功，状态码: ${response.status}，响应: ${response.data.length} 字节`);
+ 
                     return new Promise(resolve => setTimeout(resolve, 3000));
                 } else {
                     console.log(`❌ ${user} 保活失败，状态码: ${response.status}，无数据`);
