@@ -348,7 +348,7 @@ async function getNodesSummary(socket) {
     for (let user of users) {
         const nodeUrl = `https://${user}.serv00.net/node`;
         try {
-            console.log(`请求节点数据: ${nodeUrl}`);
+            console.log(`请求 ${user} 账号节点数据！`);
             const nodeResponse = await axios.get(nodeUrl, { timeout: 5000 });
             const nodeData = nodeResponse.data;
 
