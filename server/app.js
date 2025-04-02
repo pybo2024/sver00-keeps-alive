@@ -272,7 +272,7 @@ app.get("/logout", (req, res) => {
 });
 
 
-const protectedRoutes = ["/", "/ota", "/accounts", "/nodes"];
+const protectedRoutes = ["/", "/ota", "/accounts", "/nodes", "/online"];
 protectedRoutes.forEach(route => {
     app.get(route, checkPassword, isAuthenticated, (req, res) => {
         res.sendFile(path.join(__dirname, "protected", route === "/" ? "index.html" : `${route.slice(1)}.html`));
