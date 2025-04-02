@@ -396,8 +396,6 @@ function filterNodes(nodes) {
     return nodes.filter(node => node.startsWith("vmess://") || node.startsWith("hysteria2://"));
 }
 
-let isFetching = false; // 全局变量，防止重复触发
-
 async function getNodesSummary(socket) {
     const accounts = await getAccounts(true);
     if (!accounts || Object.keys(accounts).length === 0) {
@@ -406,16 +404,14 @@ async function getNodesSummary(socket) {
         return;
     }
 
-    const users = [...new Set(Object.keys(accounts))]; // 去重账号列表
+    const users = Object.keys(accounts); 
     let successfulNodes = { hysteria2: [], vmess: [] };
     let failedAccounts = [];
-
-    console.log("开始采集节点数据...");
 
     for (let user of users) {
         const nodeUrl = `https://${user}.serv00.net/node`;
         try {
-            console.log(`采集 ${user} 节点数据！`);
+            console.log(`采集 ${user} 节点数据`);
             const nodeResponse = await axios.get(nodeUrl, { timeout: 5000 });
             const nodeData = nodeResponse.data;
 
@@ -425,9 +421,9 @@ async function getNodesSummary(socket) {
             ]);
 
             nodeLinks.forEach(link => {
-                if (link.startsWith("hysteria2://") && !successfulNodes.hysteria2.includes(link)) {
+                if (link.startsWith("hysteria2://")) {
                     successfulNodes.hysteria2.push(link);
-                } else if (link.startsWith("vmess://") && !successfulNodes.vmess.includes(link)) {
+                } else if (link.startsWith("vmess://")) {
                     successfulNodes.vmess.push(link);
                 }
             });
@@ -455,22 +451,11 @@ async function getNodesSummary(socket) {
     socket.emit("nodesSummary", { successfulNodes, failedAccounts });
 }
 
-// 防止客户端多次触发采集任务
 io.on("connection", (socket) => {
     console.log("客户端已连接");
 
     socket.on("startNodesSummary", async () => {
-        if (isFetching) {
-            console.log("节点数据采集已在进行中...");
-            return; // 防止重复触发
-        }
-
-        isFetching = true; // 标记为正在采集数据
-        console.log("开始节点数据采集任务...");
-
-        await getNodesSummary(socket); // 执行采集
-
-        isFetching = false; // 完成后重置标志
+        await getNodesSummary(socket);
     });
 });
 
