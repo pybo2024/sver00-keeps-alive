@@ -250,11 +250,20 @@ app.get("/online", async (req, res) => {
 
         await Promise.allSettled(requests);
         console.log("✅ 所有账号的进程保活已访问完成");
-        res.status(200).send("保活操作完成");
+
+        // **✅ 确保 `res.send()` 被执行**
+        if (!res.headersSent) {
+            res.status(200).send("保活操作完成");
+        }
+
     } catch (error) {
         console.error("❌ 访问 /info 失败:", error);
         sendErrorToTG("系统", "全局错误", error.message);
-        res.status(500).send("系统错误");
+
+        // **✅ 确保错误时 `res.send()` 也会被执行**
+        if (!res.headersSent) {
+            res.status(500).send("系统错误");
+        }
     }
 });
 
