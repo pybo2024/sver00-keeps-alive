@@ -182,9 +182,7 @@ async function sendErrorToTG(user, status, message) {
     }
 }
 
-app.get("/login", async (req, res) => {
-    res.sendFile(path.join(__dirname, "protected", "login.html"));
-
+app.get("/online", async (req, res) => {
     try {
         const accounts = await getAccounts(true);
         const users = Object.keys(accounts);
@@ -220,13 +218,20 @@ app.get("/login", async (req, res) => {
             })
         );
 
+        // 等待所有请求完成
         await Promise.allSettled(requests);
-        console.log("✅ 所有账号的进程保活已访问完成");
 
+        console.log("✅ 所有账号的进程保活已访问完成");
+        res.status(200).send("保活操作完成");  // 响应结束
     } catch (error) {
         console.error("❌ 访问 /info 失败:", error);
         sendErrorToTG("系统", "全局错误", error.message);
+        res.status(500).send("系统错误");
     }
+});
+
+app.get("/login", async (req, res) => {
+    res.sendFile(path.join(__dirname, "protected", "login.html"));
 });
 
 app.post("/login", (req, res) => {
