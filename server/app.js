@@ -645,6 +645,17 @@ app.get("/catlog-data", isAuthenticated, (req, res) => {
     });
 });
 
+app.post("/clear-log", isAuthenticated, (req, res) => {
+    const errorLogFilePath = path.join(process.env.HOME, "domains", `${MAIN_SERVER_USER}.serv00.net`, "logs", "error.log");
+
+    fs.writeFile(errorLogFilePath, '', (err) => {
+        if (err) {
+            return res.status(500).send('Error clearing log file.');
+        }
+        res.send('Log cleared successfully');
+    });
+});
+
 app.get("/catlog", isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, "protected", "logs.html"));
 });
