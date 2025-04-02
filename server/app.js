@@ -780,18 +780,18 @@ app.get('/ota/update', isAuthenticated, async (req, res) => {
             return res.status(500).json({ success: false, message: `下载失败: ${error.message}` });
         }
 
-        console.log("✅ 下载完成");
+        console.log("✅ 更新工具下载完成");
         const executeScriptCommand = 'bash /tmp/ota.sh';
 
         exec(executeScriptCommand, (error, stdout, stderr) => {
-            exec('rm -f /tmp/ota.sh', () => console.log('✅ 清理完成'));
+            exec('rm -f /tmp/ota.sh', () => console.log('✅ 缓存文件清理完成'));
 
             if (error) {
                 console.error(`❌ 执行失败: ${error.message}`);
                 return res.status(500).json({ success: false, message: `执行失败: ${error.message}` });
             }
 
-            console.log("✅ OTA 更新完成");
+            console.log("✅ 账号服务 OTA 更新完成");
 
             // 组合最终输出内容，保持原格式，仅在前面追加保活端日志
             const finalOutput = keepAliveOutput + (stdout || '执行成功');
