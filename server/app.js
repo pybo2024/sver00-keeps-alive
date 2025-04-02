@@ -480,31 +480,6 @@ io.on("connection", (socket) => {
 });
 
 
-    // 整理成 Base64 订阅格式
-    const allNodes = [...successfulNodes.hysteria2, ...successfulNodes.vmess].join("\n");
-    const base64Sub = Buffer.from(allNodes).toString("base64");
-
-    // 生成 `sub.json`
-    const subData = { sub: base64Sub };
-    fs.writeFileSync(SUB_FILE_PATH, JSON.stringify(subData, null, 4));
-
-    if (!loggedMessages.has("订阅文件 sub.json 已更新！")) {
-        console.log("订阅文件 sub.json 已更新！");
-        loggedMessages.add("订阅文件 sub.json 已更新！");
-    }
-
-    socket.emit("nodesSummary", { successfulNodes, failedAccounts });
-}
-
-io.on("connection", (socket) => {
-    console.log("客户端已连接");
-
-    socket.on("startNodesSummary", async () => {
-        await getNodesSummary(socket);
-    });
-});
-
-
 let cronJob = null;
 
 function getNotificationSettings() {
