@@ -94,8 +94,39 @@ app.post("/setPassword", (req, res) => {
     res.redirect("/login");
 });
 
-const errorCache = new Map(); 
+const ERROR_CACHE_FILE = path.join(__dirname, "errorCache.json");
 
+// 读取缓存文件（进程重启仍然保留）
+let errorCache = new Map();
+if (fs.existsSync(ERROR_CACHE_FILE)) {
+    try {
+        errorCache = new Map(Object.entries(JSON.parse(fs.readFileSync(ERROR_CACHE_FILE, "utf-8"))));
+        console.log("✅ 加载本地错误缓存成功");
+    } catch (err) {
+        console.error("⚠️ 读取错误缓存失败:", err);
+    }
+}
+
+// 存储正在发送的错误，避免并发重复触发
+const sendingCache = new Set();
+
+/**
+ * 保存 errorCache 到本地文件
+ */
+function saveErrorCache() {
+    try {
+        fs.writeFileSync(ERROR_CACHE_FILE, JSON.stringify(Object.fromEntries(errorCache)), "utf-8");
+    } catch (err) {
+        console.error("⚠️ 保存错误缓存失败:", err);
+    }
+}
+
+/**
+ * 发送错误通知到 Telegram
+ * @param {string} user 账号
+ * @param {number|string} status HTTP 状态码
+ * @param {string} message 错误信息
+ */
 async function sendErrorToTG(user, status, message) {
     try {
         const settings = getNotificationSettings();
@@ -108,23 +139,27 @@ async function sendErrorToTG(user, status, message) {
         const cacheKey = `${user}:${status}`;
         const lastSentTime = errorCache.get(cacheKey);
 
+        // 404 状态：只发送一次
         if (status === 404) {
-            // **如果404状态已经发送过，则直接跳过**
-            if (lastSentTime) {
+            if (lastSentTime || sendingCache.has(cacheKey)) {
                 console.log(`⏳ 404 状态已发送过 ${user}，跳过通知`);
                 return;
             }
-            // **记录404状态发送时间**
-            errorCache.set(cacheKey, now);
-        } else {
-            // **非404状态：如果在3小时内发送过，则跳过**
+        }
+        // 非404 状态：3小时内不重复发送
+        else {
             if (lastSentTime && now - lastSentTime < 3 * 60 * 60 * 1000) {
                 console.log(`⏳ 3小时内已发送过 ${user} 的状态 ${status}，跳过通知`);
                 return;
             }
-            // **记录最新的非404状态发送时间**
-            errorCache.set(cacheKey, now);
         }
+
+        // 添加到发送缓存，防止并发
+        sendingCache.add(cacheKey);
+
+        // 记录发送时间
+        errorCache.set(cacheKey, now);
+        saveErrorCache();  // 保存到文件，防止进程重启丢失数据
 
         const bot = new TelegramBot(settings.telegramToken, { polling: false });
         const nowStr = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
@@ -157,14 +192,16 @@ async function sendErrorToTG(user, status, message) {
 ——————————————————
 👤 账号: \`${user}\`
 📶 状态: *${statusMessage}*
-📝 详情: *${status}*•\`${message}\`
+📝 详情: *${status}* • \`${message}\`
 ——————————————————
 🕒 时间: \`${nowStr}\``;
 
         const options = {
             parse_mode: "Markdown",
             reply_markup: {
-                inline_keyboard: [[{ text: buttonText, url: buttonUrl }]]
+                inline_keyboard: [[
+                    { text: buttonText, url: buttonUrl }
+                ]]
             }
         };
 
@@ -173,6 +210,8 @@ async function sendErrorToTG(user, status, message) {
 
     } catch (err) {
         console.error("❌ 发送 Telegram 通知失败:", err);
+    } finally {
+        sendingCache.delete(cacheKey); // 发送完成后移除
     }
 }
 
@@ -192,9 +231,6 @@ app.get("/online", async (req, res) => {
             .then(response => {
                 if (response.status === 200 && response.data) {
                     console.log(`✅ ${user} 保活成功，状态码: ${response.status}`);
-                    console.log(`📄 ${user} 响应大小: ${response.data.length} 字节`);
-
-                    // 模拟浏览器保持页面 3 秒
                     return new Promise(resolve => setTimeout(resolve, 3000));
                 } else {
                     console.log(`❌ ${user} 保活失败，状态码: ${response.status}，无数据`);
@@ -212,11 +248,9 @@ app.get("/online", async (req, res) => {
             })
         );
 
-        // 等待所有请求完成
         await Promise.allSettled(requests);
-
         console.log("✅ 所有账号的进程保活已访问完成");
-        res.status(200).send("保活操作完成");  // 响应结束
+        res.status(200).send("保活操作完成");
     } catch (error) {
         console.error("❌ 访问 /info 失败:", error);
         sendErrorToTG("系统", "全局错误", error.message);
