@@ -404,14 +404,23 @@ async function getNodesSummary(socket) {
         return;
     }
 
-    const users = Object.keys(accounts); 
+    const users = Object.keys(accounts);
     let successfulNodes = { hysteria2: [], vmess: [] };
     let failedAccounts = [];
+
+    const loggedMessages = new Set(); // 用于去重日志信息
 
     for (let user of users) {
         const nodeUrl = `https://${user}.serv00.net/node`;
         try {
-            console.log(`采集 ${user} 节点数据`);
+            const logMessage = `采集 ${user} 节点数据！`;
+
+            // 只有未输出过的日志才打印
+            if (!loggedMessages.has(logMessage)) {
+                console.log(logMessage);
+                loggedMessages.add(logMessage);
+            }
+
             const nodeResponse = await axios.get(nodeUrl, { timeout: 5000 });
             const nodeData = nodeResponse.data;
 
@@ -429,11 +438,19 @@ async function getNodesSummary(socket) {
             });
 
             if (nodeLinks.length === 0) {
-                console.log(`账号 ${user} 连接成功但无有效节点`);
+                const failedMessage = `账号 ${user} 连接成功但无有效节点`;
+                if (!loggedMessages.has(failedMessage)) {
+                    console.log(failedMessage);
+                    loggedMessages.add(failedMessage);
+                }
                 failedAccounts.push(user);
             }
         } catch (error) {
-            console.log(`账号 ${user} 获取节点失败: ${error.message}`);
+            const errorMessage = `账号 ${user} 获取节点失败: ${error.message}`;
+            if (!loggedMessages.has(errorMessage)) {
+                console.log(errorMessage);
+                loggedMessages.add(errorMessage);
+            }
             failedAccounts.push(user);
         }
     }
@@ -446,7 +463,10 @@ async function getNodesSummary(socket) {
     const subData = { sub: base64Sub };
     fs.writeFileSync(SUB_FILE_PATH, JSON.stringify(subData, null, 4));
 
-    console.log("订阅文件 sub.json 已更新！");
+    if (!loggedMessages.has("订阅文件 sub.json 已更新！")) {
+        console.log("订阅文件 sub.json 已更新！");
+        loggedMessages.add("订阅文件 sub.json 已更新！");
+    }
 
     socket.emit("nodesSummary", { successfulNodes, failedAccounts });
 }
@@ -458,6 +478,7 @@ io.on("connection", (socket) => {
         await getNodesSummary(socket);
     });
 });
+
 
 let cronJob = null;
 
