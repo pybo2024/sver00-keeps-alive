@@ -79,7 +79,7 @@
             overflow: auto;
             white-space: pre-wrap;
             color: black;
-            font-size: 14px;
+            font-size: 12px;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -162,7 +162,7 @@
     <script>
         const socket = io();
         let nodesText = "";
-        let isRequesting = false;  // 标志防止多次请求
+        let isRequesting = false;
 
         const startBtn = document.getElementById("startBtn");
         const startContent = document.getElementById("startContent");
@@ -173,8 +173,8 @@
         subLinkInput.value = `https://${location.hostname}/sub`;
 
         function startNodesSummary() {
-            if (isRequesting) return;  // 如果请求已在进行中，直接返回
-            isRequesting = true;  // 标记请求开始
+            if (isRequesting) return;
+            isRequesting = true;
 
             startBtn.classList.add("btn-disabled");
             startBtn.disabled = true;
@@ -200,7 +200,12 @@
         }
 
         socket.on("nodesSummary", (data) => {
-            isRequesting = false;  // 请求结束，重置标志
+            isRequesting = false;
+
+            // 修复：任务完成后按钮恢复可点击状态
+            startBtn.classList.remove("btn-disabled");
+            startBtn.disabled = false;
+            startContent.innerText = "节点采集";
 
             const failedAccountsDiv = document.getElementById("failedAccounts");
 
